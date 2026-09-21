@@ -47,3 +47,6 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+# Data files - do not track
+*.rds
+*.csv
