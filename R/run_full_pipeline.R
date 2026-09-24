@@ -47,6 +47,7 @@ library(pheatmap)
 
 source("R/marker_panels.R")
 source("R/classify_atlas_index.R")
+source("R/apply_confidence_filter.R")
 source("R/process_sample_template.R")
 source("R/build_composition_summary.R")
 source("R/plot_composition_barchart.R")
