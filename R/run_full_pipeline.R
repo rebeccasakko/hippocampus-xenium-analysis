@@ -49,13 +49,16 @@ dir.create("outputs", showWarnings = FALSE)
 # ============================================================
 sample_config <- tibble::tribble(
     ~sample_id, ~group_id, ~data_dir,                          ~lasso_csv,
-    "gi_1_b",   "gi",      "/path/to/raw/gi_1_b/",             "/path/to/lasso/gi_1_b_hippocampus.csv",
-    "gi_2_d",   "gi",      "/path/to/raw/gi_2_d/",             "/path/to/lasso/gi_2_d_hippocampus.csv",
-    "gi_3_f",   "gi",      "/path/to/raw/gi_3_f/",             "/path/to/lasso/gi_3_f_hippocampus.csv",
-    "gii_1_a",  "gii",     "/path/to/raw/gii_1_a/",            "/path/to/lasso/gii_1_a_hippocampus.csv",
-    "gii_2_c",  "gii",     "/path/to/raw/gii_2_c/",            "/path/to/lasso/gii_2_c_hippocampus.csv",
-    "gii_3_e",  "gii",     "/path/to/raw/gii_3_e/",            "/path/to/lasso/gii_3_e_hippocampus.csv"
+    "gi_1_b",   "gi",      "/path/to/raw/gi_1_b/",             "~/Desktop/hippocampus_gi_1_b.csv",
+    "gi_2_d",   "gi",      "/path/to/raw/gi_2_d/",             "~/Desktop/hippocampus_gi_2_d.csv",
+    "gi_3_f",   "gi",      "/path/to/raw/gi_3_f/",             "~/Desktop/hippocampus_gi_3_f.csv",
+    "gii_1_a",  "gii",     "/path/to/raw/gii_1_a/",            "~/Desktop/hippocampus_gii_1_a.csv",
+    "gii_2_c",  "gii",     "/path/to/raw/gii_2_c/",            "~/Desktop/hippocampus_gii_2_c.csv",
+    "gii_3_e",  "gii",     "/path/to/raw/gii_3_e/",            "~/Desktop/hippocampus_gii_3_e.csv"
 )
+# NOTE: data_dir (the raw Xenium output folder LoadXenium() reads) is
+# still a placeholder -- those live on "Joe" or elsewhere, not Desktop.
+# Fill those in before running.
 
 # ============================================================
 # Stage 1: per-sample load -> QC -> normalize -> lasso-restrict -> classify
