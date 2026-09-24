@@ -18,6 +18,7 @@ Two methods are run per cell type and reported together: a pseudobulk DESeq2 ana
 
 ## Repository structure
 
+- `R/run_full_pipeline.R` — the full pipeline end to end: raw samples → classification → composition → UMAP → both DE analyses. Edit its CONFIG section (data paths) before running; not meant to be run unattended the first time.
 - `R/marker_panels.R` — cell-type classification marker gene panel definitions
 - `R/classify_atlas_index.R` — core per-cell classification function
 - `R/process_sample_template.R` — `process_hippocampus_sample()`: per-sample load → QC → normalize → lasso-restrict → classify pipeline
