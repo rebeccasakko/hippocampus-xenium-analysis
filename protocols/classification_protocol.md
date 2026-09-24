@@ -66,21 +66,37 @@ don't conflate the two.)
 
 ## Marker panels
 
-| Top-level identity | Marker panel (argmax gate) |
-|---|---|
-| Astrocyte | Aldh1l1, Sox9 |
-| Microglia | Tmem119, Sall1, P2ry13 |
-| Oligodendrocyte lineage | Sox10, Olig1, Olig2 |
-| Endothelial | Pecam1, Id1 |
-| Pericyte/vascular SMC | Kcnj8, Myh11, Pdgfrb |
-| Fibroblast/meningeal | Col1a1, Col1a2, Lum, Fn1 |
-| Ependymal/ciliated | Foxj1, Pifo, Dnah12 |
-| Choroid plexus | Folr1, Kl, Otx2 |
-| BAM | Mrc1, F13a1, Cd163 |
-| Hippocampal pyramidal | Slc17a7, Fibcd1, Spink8, Hes1, Rab38, Pou3f1, Hcn1, Map3k15 |
-| Dentate gyrus granule | Slc17a7, Prox1 |
-| GABAergic interneuron | Gad1, Gad2, Slc32a1 |
-| Purkinje (sanity check) | Pcp2 -- negative control; hippocampus should classify ~0% of cells here |
+| Top-level identity | Marker panel (argmax gate) | Region |
+|---|---|---|
+| Astrocyte | Aldh1l1, Sox9 | Hippocampus + Optic Tract |
+| Microglia | Tmem119, Sall1, P2ry13 | Hippocampus + Optic Tract |
+| Oligodendrocyte lineage | Sox10, Olig1, Olig2 | Hippocampus + Optic Tract |
+| Endothelial | Pecam1, Id1 | Hippocampus + Optic Tract |
+| Pericyte/vascular SMC | Kcnj8, Myh11, Pdgfrb | Hippocampus + Optic Tract |
+| Fibroblast/meningeal | Col1a1, Col1a2, Lum, Fn1 | Hippocampus + Optic Tract |
+| Ependymal/ciliated | Foxj1, Pifo, Dnah12 | Hippocampus + Optic Tract |
+| Choroid plexus | Folr1, Kl, Otx2 | Hippocampus + Optic Tract |
+| BAM | Mrc1, F13a1, Cd163 | Hippocampus + Optic Tract |
+| Hippocampal pyramidal | Slc17a7, Fibcd1, Spink8, Hes1, Rab38, Pou3f1, Hcn1, Map3k15 | Hippocampus + Optic Tract |
+| Dentate gyrus granule | Slc17a7, Prox1 | Hippocampus + Optic Tract |
+| GABAergic interneuron | Gad1, Gad2, Slc32a1 | Hippocampus + Optic Tract |
+| Purkinje (sanity check) | Pcp2 -- negative control; hippocampus should classify ~0% of cells here | Hippocampus + Optic Tract |
+| Peripheral macrophage | Ccr2, Cd14, Ms4a7 -- distinguishes infiltrating from resident (BAM) macrophage | Added for Optic Tract, 2026-09-24 |
+| T cell | Cd3e, Cd3d, Cd3g -- pan-T-cell (TCR complex) | Added for Optic Tract, 2026-09-24 |
+| Neutrophil | Ly6g, Csf3r, Cxcr2 | Added for Optic Tract, 2026-09-24 |
+| NK cell | Ncr1, Klrb1c, Gzmb, Klrk1, Prf1 | Added for Optic Tract, 2026-09-24 |
+| B cell | Cd19, Cd79a, Cd79b, Ms4a1, Cd22, Pax5 | Added for Optic Tract, 2026-09-24 |
+| Dendritic cell | Itgax, Cd83, Batf3, Xcr1, Clec9a | Added for Optic Tract, 2026-09-24 |
+| RGC (sanity check) | Pou4f1, Sncg -- negative control; optic tract is axonal, no RGC soma present, should read ~0% | Added for Optic Tract, 2026-09-24 |
+
+All panels listed here apply to every region -- the classification code
+does not change between regions (see "Why no clustering?" below);
+"Region" above only records when/why a panel was added, and which
+regions have actually been checked against it so far. The seven
+Optic-Tract-motivated additions were confirmed present in the Xenium
+Prime Mouse 5K pan-tissue panel via a metadata scan before being added
+here, following the same citation-and-verification discipline as every
+other panel in this table.
 
 | State refinement | Active / Mature panel | Homeostatic / Precursor panel |
 |---|---|---|

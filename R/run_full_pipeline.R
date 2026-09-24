@@ -51,6 +51,7 @@ source("R/process_sample_template.R")
 source("R/build_composition_summary.R")
 source("R/plot_composition_barchart.R")
 source("R/plot_umap_celltype.R")
+source("R/plot_spatial_celltype.R")
 source("R/de_candidate_panels.R")
 source("R/run_pseudobulk_de.R")
 source("R/run_wilcox_de.R")
@@ -163,12 +164,12 @@ run_region_pipeline <- function(sample_base, lasso_map, region_label, de_cell_ty
 # ============================================================
 sample_base <- tibble::tribble(
     ~sample_id, ~group_id, ~data_dir,
-    "gi_1_b",   "gi",      "/path/to/raw/gi_1_b/",
-    "gi_2_d",   "gi",      "/path/to/raw/gi_2_d/",
-    "gi_3_f",   "gi",      "/path/to/raw/gi_3_f/",
-    "gii_1_a",  "gii",     "/path/to/raw/gii_1_a/",
-    "gii_2_c",  "gii",     "/path/to/raw/gii_2_c/",
-    "gii_3_e",  "gii",     "/path/to/raw/gii_3_e/"
+    "gi_1_b",   "gi",      "/Volumes/Joe/Becca and Sakthi Files/Xenium_Data/Group_i/0071470_gi_1_b/",
+    "gi_2_d",   "gi",      "/Volumes/Joe/Becca and Sakthi Files/Xenium_Data/Group_i/0071470_gi_2_d/",
+    "gi_3_f",   "gi",      "/Volumes/Joe/Becca and Sakthi Files/Xenium_Data/Group_i/0071470_gi_3_f/",
+    "gii_1_a",  "gii",     "/Volumes/Joe/Becca and Sakthi Files/Xenium_Data/Group_ii/0071470_gii_1_a/",
+    "gii_2_c",  "gii",     "/Volumes/Joe/Becca and Sakthi Files/Xenium_Data/Group_ii/0071470_gii_2_c/",
+    "gii_3_e",  "gii",     "/Volumes/Joe/Becca and Sakthi Files/Xenium_Data/Group_ii/0071470_gii_3_e/"
 )
 
 # ============================================================
@@ -206,12 +207,12 @@ hippocampus_de_cell_types <- list(
 # literature-backed candidates for it.
 # ============================================================
 optic_tract_lassos <- c(
-    gi_1_b  = "/path/to/lasso/optic_tract_gi_1_b.csv",
-    gi_2_d  = "/path/to/lasso/optic_tract_gi_2_d.csv",
-    gi_3_f  = "/path/to/lasso/optic_tract_gi_3_f.csv",
-    gii_1_a = "/path/to/lasso/optic_tract_gii_1_a.csv",
-    gii_2_c = "/path/to/lasso/optic_tract_gii_2_c.csv",
-    gii_3_e = "/path/to/lasso/optic_tract_gii_3_e.csv"
+    gi_1_b  = "~/Desktop/optic_tract_gi_1_b.csv",
+    gi_2_d  = "~/Desktop/optic_tract_gi_2_d.csv",
+    gi_3_f  = "~/Desktop/optic_tract_gi_3_f.csv",
+    gii_1_a = "~/Desktop/optic_tract_gii_1_a.csv",
+    gii_2_c = "~/Desktop/optic_tract_gii_2_c.csv",
+    gii_3_e = "~/Desktop/optic_tract_gii_3_e.csv"
 )
 
 optic_tract_de_cell_types <- list(
