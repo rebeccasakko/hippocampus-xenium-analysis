@@ -1,6 +1,8 @@
 # Hippocampus Xenium Analysis
 
-Spatial transcriptomics analysis pipeline for hippocampal cell-type composition and differential expression in a Xenium in situ dataset (mouse brain, blinded groups "gi" and "gii", n = 3 samples per group). Abisambra Lab, University of Florida.
+Spatial transcriptomics analysis pipeline for cell-type composition and differential expression across multiple brain regions in a Xenium in situ dataset (mouse brain, blinded groups "gi" and "gii", n = 3 samples per group, same 6 mice used for every region -- only the ROI lasso differs). Abisambra Lab, University of Florida.
+
+Regions analyzed so far: Hippocampus, Optic Tract. A third region is planned but not yet determined.
 
 ## Cell-type classification (v3: atlas-informed marker-index)
 
@@ -18,7 +20,7 @@ Two methods are run per cell type and reported together: a pseudobulk DESeq2 ana
 
 ## Repository structure
 
-- `R/run_full_pipeline.R` — the full pipeline end to end: raw samples → classification → composition → UMAP → both DE analyses. Edit its CONFIG section (data paths) before running; not meant to be run unattended the first time.
+- `R/run_full_pipeline.R` — `run_region_pipeline()`: the full pipeline end to end (classification → composition → UMAP → both DE analyses), called once per brain region since the raw data and mouse lineup are shared (same 6 mice) and only the lasso ROI and DE cell-type list differ per region. Currently configured for Hippocampus and Optic Tract. Edit the CONFIG sections (data paths) before running; not meant to be run unattended the first time.
 - `R/marker_panels.R` — cell-type classification marker gene panel definitions
 - `R/classify_atlas_index.R` — core per-cell classification function
 - `R/process_sample_template.R` — `process_hippocampus_sample()`: per-sample load → QC → normalize → lasso-restrict → classify pipeline
