@@ -20,14 +20,23 @@ function(summary_df, group_colors,
             scale_shape_manual(values = c("1" = 1, "2" = 0, "3" = 2), name = "Sample")
     }
     
+    # % value labels: rotated 90 degrees and right-justified against the y = -1
+    # baseline so each label only needs the height of a text string, not its
+    # full printed width, to clear its neighbor. With up to ~20 cell-type
+    # categories x 2 groups = 40 dodged bars on one chart (Optic Tract), the
+    # unrotated version (size = 2.1, vjust = 1) collided into an illegible
+    # smear at the bottom of the chart -- flagged 2026-09-28. Rotating fixes
+    # this regardless of how many categories a given region's panel has, so
+    # this is a rendering-only fix, not a per-region special case.
     p +
         geom_text(aes(label = sprintf("%.1f%%", mean_pct), y = -1),
                   position = position_dodge(width = 0.85),
-                  size = 2.1, fontface = "bold", color = "black", vjust = 1) +
+                  size = 2.4, fontface = "bold", color = "black",
+                  angle = 90, hjust = 1, vjust = 0.5) +
         scale_fill_manual(values = group_colors, name = "Group") +
-        scale_y_continuous(expand = expansion(mult = c(0.12, 0.05))) +
+        scale_y_continuous(expand = expansion(mult = c(0.18, 0.05))) +
         coord_cartesian(clip = "off") +
-        labs(x = NULL, y = "% of cells (mean \u00b1 SEM, n = 3 per group)",
+        labs(x = NULL, y = "% of cells (mean ± SEM, n = 3 per group)",
              title = title, subtitle = subtitle) +
         theme_classic(base_size = 12) +
         theme(
@@ -38,6 +47,6 @@ function(summary_df, group_colors,
             plot.subtitle = element_text(color = "grey40", size = 9.5),
             legend.title = element_text(face = "bold"),
             legend.key = element_blank(),
-            plot.margin = margin(t = 10, r = 10, b = 40, l = 25)
+            plot.margin = margin(t = 10, r = 10, b = 55, l = 25)
         )
 }
