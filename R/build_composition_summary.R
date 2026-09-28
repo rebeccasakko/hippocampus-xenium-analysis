@@ -1,8 +1,25 @@
 build_composition_summary <-
 function(sample_list, group_levels = c("gii", "gi")) {
-    
+
+    # Every cell_type seen in ANY sample must get an explicit row (even if
+    # n_cells = 0) in EVERY sample. table(obj$cell_type) on its own only
+    # returns levels actually present in that one sample -- a cell_type
+    # that's absent (whether because its panel was excluded from scoring
+    # entirely at the detection floor, or it just happened to get zero
+    # cells) silently gets NO row at all, rather than a 0% row. That
+    # silently drops that sample out of the category's mean/SEM below,
+    # shrinking n_samples for that one category without changing the
+    # plot's "n = 3 per group" label, and biasing mean_pct upward by
+    # averaging only over the samples where the category happened to
+    # appear. Confirmed 2026-09-28 via Optic Tract: BAM was silently
+    # averaged over n=2 gi samples instead of 3 (10.5% shown vs the true
+    # 7.0%), and B cell -- present in all 3 gi samples, absent in all 3
+    # gii samples -- had NO gii row at all, rendering as a bar with only
+    # one group's percentage instead of two.
+    all_cell_types <- unique(unlist(lapply(sample_list, function(obj) unique(obj$cell_type))))
+
     composition_df <- do.call(rbind, lapply(sample_list, function(obj) {
-        tab <- table(obj$cell_type)
+        tab <- table(factor(obj$cell_type, levels = all_cell_types))
         data.frame(
             sample_id = unique(obj$sample_id),
             group_id  = unique(obj$group_id),
