@@ -45,9 +45,30 @@ atlas_index_markers <- list(
 # positives. GABAergic interneuron was kept as an Optic Tract candidate:
 # Gad1/Gad2/Slc32a1 aren't hippocampus-restricted and didn't show this
 # problem. See protocols/classification_protocol.md.
+#
+# RGC (sanity check) is ALSO excluded here, 2026-09-28, for a different
+# reason than the two panels above: its margin distribution turned out to
+# be cleanly bimodal, not uniformly noisy. Roughly half of RGC-labeled
+# cells have near-zero classification_margin (real near-tie noise,
+# fixable by a confidence filter); the other half have very large margins
+# (4.9-6.9) -- confidently, unambiguously called RGC, not a tie. No single
+# margin threshold can resolve both halves at once. The confident half is
+# suspected (not yet fully confirmed) to be driven by Sncg alone, which
+# has documented cross-reactivity with vascular/renal/smooth-muscle cell
+# types in the reference atlas -- plausible here given Optic Tract's own
+# vasculature (Endothelial/Pericyte/Fibroblast). Given the Sncg
+# cross-reactivity lead was not yet fully run down and time was limited
+# ahead of a 2026-09-30 presentation, excluded RGC as a candidate for
+# Optic Tract rather than leave it half-fixed. NOTE: this gives up the
+# sanity check's original purpose here (catching a lasso straying toward
+# the retina/optic nerve head) -- a real, deliberate tradeoff, not an
+# oversight. Revisit before final submission: confirm/resolve the Sncg
+# driver-gene hypothesis (see protocols/classification_protocol.md) and
+# decide whether to reinstate a corrected RGC panel.
 optic_tract_markers <- atlas_index_markers
 optic_tract_markers[["Hippocampal pyramidal"]] <- NULL
 optic_tract_markers[["Dentate gyrus granule"]] <- NULL
+optic_tract_markers[["RGC (sanity check)"]] <- NULL
 
 astro_active_markers <- c("Gfap", "Serpina3n")
 astro_homeostatic_markers <- c("Aldh1l1", "Sox9")

@@ -90,7 +90,7 @@ don't conflate the two.)
 | NK cell | Ncr1, Klrb1c, Gzmb, Klrk1, Prf1 | Added for Optic Tract, 2026-09-24 |
 | B cell | Cd19, Cd79a, Cd79b, Ms4a1, Cd22, Pax5 | Added for Optic Tract, 2026-09-24 |
 | Dendritic cell | Itgax, Cd83, Batf3, Xcr1, Clec9a | Added for Optic Tract, 2026-09-24 |
-| RGC (sanity check) | Pou4f1, Sncg -- negative control; optic tract is axonal, no RGC soma present, should read ~0% | Added for Optic Tract, 2026-09-24 |
+| RGC (sanity check) | Pou4f1, Sncg -- negative control; optic tract is axonal, no RGC soma present, should read ~0% | Added for Optic Tract, 2026-09-24; excluded from the Optic Tract candidate list, 2026-09-28 -- see below |
 
 Every panel listed here is checked against the Xenium Prime Mouse 5K
 pan-tissue panel before being added (the same citation-and-verification
@@ -153,6 +153,40 @@ an Optic Tract candidate: Gad1/Gad2/Slc32a1 are not hippocampus-restricted
 markers to begin with (inhibitory interneurons are present throughout the
 CNS, including along white matter tracts), and it did not show the
 low-diversity single-gene-driver pattern found above.
+
+### RGC (sanity check) -- excluded from Optic Tract, 2026-09-28
+
+Unlike Hippocampal pyramidal and Dentate gyrus granule, RGC's problem
+turned out not to be a single clean explanation. Its classification_margin
+distribution among Optic Tract cells labeled RGC is cleanly bimodal:
+roughly half sit at near-zero margin (real near-tie noise against panels
+like BAM/Dendritic cell -- the same failure mode already fixed for BAM in
+hippocampus), and the other half sit at a very large margin (4.9-6.9) --
+confidently, unambiguously called RGC, not a tie. There is a clean gap
+between the two clusters, so no single confidence-margin threshold can
+resolve both: any threshold that clears the noise half either does
+nothing more for the confident half (if too low) or starts costing real
+cells in unrelated panels like Astrocyte/Microglia for no additional RGC
+benefit (if raised further).
+
+The confident half is suspected, but not yet confirmed, to be driven by
+Sncg alone -- Sncg has documented cross-reactivity with vascular/renal/
+smooth-muscle cell types in the reference atlas, and Optic Tract has real
+vasculature (Endothelial, Pericyte/vascular SMC, Fibroblast/meningeal)
+that could plausibly supply confident false positives the same way Pou3f1
+and Prox1 did for the two panels excluded above. This has not been
+verified with a per-gene detection-rate split by margin group the way the
+Hippocampal pyramidal/Dentate gyrus granule cause was.
+
+Given time constraints ahead of a 2026-09-30 presentation, RGC was
+excluded from the Optic Tract candidate list rather than left half-fixed
+-- this is a deliberate, time-boxed decision, not a resolution. It gives
+up the sanity check's original purpose for Optic Tract (catching a lasso
+that strayed toward the retina/optic nerve head). **Revisit before final
+submission**: confirm the Sncg driver-gene hypothesis, decide on a
+corrected RGC panel (e.g. requiring both Pou4f1 and Sncg rather than
+either alone, if Pou4f1 independently clears the detection floor), and
+reinstate it as a sanity check once fixed.
 
 | State refinement | Active / Mature panel | Homeostatic / Precursor panel |
 |---|---|---|
