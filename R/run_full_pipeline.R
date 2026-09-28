@@ -81,7 +81,8 @@ source("R/plot_de_heatmap.R")
 #                   region so runs don't overwrite each other
 # ============================================================
 run_region_pipeline <- function(sample_base, lasso_map, region_label, de_cell_types, output_dir,
-                                 marker_list = atlas_index_markers) {
+                                 marker_list = atlas_index_markers,
+                                 confidence_percentile = NULL) {
 
     dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
 
@@ -106,6 +107,16 @@ run_region_pipeline <- function(sample_base, lasso_map, region_label, de_cell_ty
         )
     })
     names(sample_objects) <- sample_config$sample_id
+
+    # ---- Stage 1b: confidence-margin filter (optional, region-derived) ----
+    # Only applied when confidence_percentile is supplied -- hippocampus
+    # is called without it and stays on its existing BAM-specific fix.
+    # See R/apply_confidence_filter.R for the rationale on deriving the
+    # threshold from this region's own pooled margin distribution rather
+    # than reusing a fixed number across regions.
+    if (!is.null(confidence_percentile)) {
+        sample_objects <- apply_confidence_filter_pooled(sample_objects, percentile = confidence_percentile)
+    }
 
     # ---- Stage 2: merge (JoinLayers() collapses Seurat v5's per-sample layers) ----
     combined <- merge(sample_objects[[1]], y = sample_objects[-1],
@@ -243,4 +254,5 @@ hippocampus_results <- run_region_pipeline(
 optic_tract_results <- run_region_pipeline(
     sample_base, optic_tract_lassos, "Optic Tract",
     optic_tract_de_cell_types, "outputs/optic_tract",
-    marker_list = optic_tract_markers)
+    marker_list = optic_tract_markers,
+    confidence_percentile = 0.15)

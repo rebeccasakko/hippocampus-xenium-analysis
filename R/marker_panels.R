@@ -65,10 +65,22 @@ atlas_index_markers <- list(
 # oversight. Revisit before final submission: confirm/resolve the Sncg
 # driver-gene hypothesis (see protocols/classification_protocol.md) and
 # decide whether to reinstate a corrected RGC panel.
+#
+# Ependymal/ciliated is ALSO excluded here, 2026-09-28: the same
+# single-gene-driver pattern as Hippocampal pyramidal/Dentate gyrus
+# granule. Foxj1 alone is detected in 65-100% of cells this panel calls
+# in every Optic Tract sample, while Pifo and Dnah12 -- the genes that
+# would provide real ciliated-ependymal specificity -- sit at 0-2.9% in
+# every sample. Real ependymal tissue would express all three cilia
+# genes together, so this argues for a marker cross-reactivity artifact
+# (Foxj1 is broadly tied to motile ciliogenesis, not ependymal identity
+# specifically) rather than the lasso boundary catching genuine
+# periventricular tissue. See protocols/classification_protocol.md.
 optic_tract_markers <- atlas_index_markers
 optic_tract_markers[["Hippocampal pyramidal"]] <- NULL
 optic_tract_markers[["Dentate gyrus granule"]] <- NULL
 optic_tract_markers[["RGC (sanity check)"]] <- NULL
+optic_tract_markers[["Ependymal/ciliated"]] <- NULL
 
 astro_active_markers <- c("Gfap", "Serpina3n")
 astro_homeostatic_markers <- c("Aldh1l1", "Sox9")

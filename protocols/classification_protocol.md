@@ -77,7 +77,7 @@ don't conflate the two.)
 | Endothelial | Pecam1, Id1 | Hippocampus + Optic Tract |
 | Pericyte/vascular SMC | Kcnj8, Myh11, Pdgfrb | Hippocampus + Optic Tract |
 | Fibroblast/meningeal | Col1a1, Col1a2, Lum, Fn1 | Hippocampus + Optic Tract |
-| Ependymal/ciliated | Foxj1, Pifo, Dnah12 | Hippocampus + Optic Tract |
+| Ependymal/ciliated | Foxj1, Pifo, Dnah12 | Hippocampus only -- excluded from Optic Tract candidate list, 2026-09-28 -- see below |
 | Choroid plexus | Folr1, Kl, Otx2 | Hippocampus + Optic Tract |
 | BAM | Mrc1, F13a1, Cd163 | Hippocampus + Optic Tract |
 | Hippocampal pyramidal | Slc17a7, Fibcd1, Spink8, Hes1, Rab38, Pou3f1, Hcn1, Map3k15 | Hippocampus only -- excluded from Optic Tract candidate list, 2026-09-28 |
@@ -154,6 +154,24 @@ markers to begin with (inhibitory interneurons are present throughout the
 CNS, including along white matter tracts), and it did not show the
 low-diversity single-gene-driver pattern found above.
 
+### Ependymal/ciliated -- excluded from Optic Tract, 2026-09-28
+
+Same failure mode as Hippocampal pyramidal/Dentate gyrus granule, caught
+the same way. Foxj1 is detected in 65-100% of the cells this panel calls
+in every Optic Tract sample, while Pifo and Dnah12 -- the genes that would
+actually confirm ciliated-ependymal identity -- sit at 0-2.9% in every
+sample. Real ependymal tissue expresses all three cilia-program genes
+together; Foxj1 alone firing is more consistent with its broader tie to
+motile ciliogenesis generally than to ependymal identity specifically.
+This also argues against a competing hypothesis raised during review (that
+the Optic Tract lasso was simply catching adjacent periventricular
+tissue): true lasso contamination would be expected to carry all three
+genes together as real tissue, not one gene in isolation. Choroid plexus
+was evaluated against the same two-gene-coherence question and left
+unresolved -- Otx2 and Folr1 both contribute somewhat (not one gene doing
+all the work), so it doesn't show the same clean single-driver signature;
+revisit with more time.
+
 ### RGC (sanity check) -- excluded from Optic Tract, 2026-09-28
 
 Unlike Hippocampal pyramidal and Dentate gyrus granule, RGC's problem
@@ -223,6 +241,43 @@ noise-averaging effect of clustering.
 - `classification_margin` -- gap between the winning and runner-up panel's
   z-scored module score (larger = more confident call)
 - `runner_up` -- the second-place panel, for reviewing ambiguous cells
+
+## Confidence-margin filtering (region-derived threshold)
+
+`apply_confidence_filter_pooled()` (`R/apply_confidence_filter.R`) derives
+a `classification_margin` floor as a percentile of the POOLED margin
+distribution across all samples in a region, rather than reusing a fixed
+raw number across regions. This matters because `classification_margin`
+is mechanically panel-count-dependent: more competing candidate panels
+shrinks typical winning margins regardless of classification quality, so
+a threshold calibrated in one region's panel-count context doesn't
+transfer to a region with a different panel count.
+
+This was discovered 2026-09-28 when Hippocampus's validated BAM threshold
+(`margin > 1`, from the detection-floor noise fix documented above) was
+first reused as-is for Optic Tract and badly over-corrected: Unclassified
+jumped to ~50%, and even confidently-called categories like Astrocyte and
+Microglia lost ~37% of their cells at that threshold -- well inside their
+normal, non-ambiguous margin range (1st-quartile margins of 0.67-0.83),
+not a genuine confidence floor for Optic Tract's panel count. A percentile
+of the region's own observed distribution was adopted instead so the
+DERIVATION RULE stays uniform across regions even though the resulting
+raw threshold differs by region -- analogous to how a multiple-testing
+correction threshold is expected to shift with the number of tests
+performed, not stay fixed.
+
+Optic Tract uses the 15th percentile of its own pooled margin distribution
+(`run_region_pipeline(..., confidence_percentile = 0.15)`) -- chosen as
+the smallest percentile that already captures the full near-tie noise
+population found in the RGC (sanity check) diagnostic before RGC was
+excluded (RGC's margin distribution was cleanly bimodal, with the
+noise-driven half fully separated from the confident half by a wide gap;
+15% was the smallest percentile threshold that captured all of the
+noise-driven half with minimal cost elsewhere). Hippocampus is not (yet)
+using this mechanism -- it still runs on the original BAM-specific
+`margin > 1` fix. **Before final submission**: re-derive Hippocampus's
+threshold the same percentile-based way for methodological consistency
+between regions, rather than leaving it on the older ad hoc fix.
 
 ## QC checks
 
