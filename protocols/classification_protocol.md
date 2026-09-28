@@ -36,7 +36,10 @@ don't conflate the two.)
 
 4. **Per-cell atlas classification** (`classify_atlas_index()`,
    `R/classify_atlas_index.R`, marker panels in `R/marker_panels.R`).
-   For each of the ~13 atlas cell-type panels (see table below), every
+   For each atlas cell-type panel in the candidate list passed as
+   `marker_list` (defaults to the full `atlas_index_markers`, ~13 panels
+   for hippocampus; optic tract uses `optic_tract_markers`, which drops
+   two panels -- see "Region-specific candidate panel set" below), every
    cell gets a `Seurat::AddModuleScore()` value for that panel. Scores are
    z-scored across cells *within each panel*, and each cell's top-level
    identity (`atlas_identity`) is the panel with the highest z-scored score
@@ -77,8 +80,8 @@ don't conflate the two.)
 | Ependymal/ciliated | Foxj1, Pifo, Dnah12 | Hippocampus + Optic Tract |
 | Choroid plexus | Folr1, Kl, Otx2 | Hippocampus + Optic Tract |
 | BAM | Mrc1, F13a1, Cd163 | Hippocampus + Optic Tract |
-| Hippocampal pyramidal | Slc17a7, Fibcd1, Spink8, Hes1, Rab38, Pou3f1, Hcn1, Map3k15 | Hippocampus + Optic Tract |
-| Dentate gyrus granule | Slc17a7, Prox1 | Hippocampus + Optic Tract |
+| Hippocampal pyramidal | Slc17a7, Fibcd1, Spink8, Hes1, Rab38, Pou3f1, Hcn1, Map3k15 | Hippocampus only -- excluded from Optic Tract candidate list, 2026-09-28 |
+| Dentate gyrus granule | Slc17a7, Prox1 | Hippocampus only -- excluded from Optic Tract candidate list, 2026-09-28 |
 | GABAergic interneuron | Gad1, Gad2, Slc32a1 | Hippocampus + Optic Tract |
 | Purkinje (sanity check) | Pcp2 -- negative control; hippocampus should classify ~0% of cells here | Hippocampus + Optic Tract |
 | Peripheral macrophage | Ccr2, Cd14, Ms4a7 -- distinguishes infiltrating from resident (BAM) macrophage | Added for Optic Tract, 2026-09-24 |
@@ -89,14 +92,67 @@ don't conflate the two.)
 | Dendritic cell | Itgax, Cd83, Batf3, Xcr1, Clec9a | Added for Optic Tract, 2026-09-24 |
 | RGC (sanity check) | Pou4f1, Sncg -- negative control; optic tract is axonal, no RGC soma present, should read ~0% | Added for Optic Tract, 2026-09-24 |
 
-All panels listed here apply to every region -- the classification code
-does not change between regions (see "Why no clustering?" below);
-"Region" above only records when/why a panel was added, and which
-regions have actually been checked against it so far. The seven
-Optic-Tract-motivated additions were confirmed present in the Xenium
-Prime Mouse 5K pan-tissue panel via a metadata scan before being added
-here, following the same citation-and-verification discipline as every
-other panel in this table.
+Every panel listed here is checked against the Xenium Prime Mouse 5K
+pan-tissue panel before being added (the same citation-and-verification
+discipline for every row). Most panels apply to every region unchanged --
+"Region" mostly records when/why a panel was added, not a restriction. The
+two exceptions are Hippocampal pyramidal and Dentate gyrus granule, which
+are excluded from the Optic Tract candidate list specifically (see below).
+
+### Region-specific candidate panel set (Optic Tract)
+
+`optic_tract_markers` (`R/marker_panels.R`) is `atlas_index_markers` with
+Hippocampal pyramidal and Dentate gyrus granule removed, and is what
+`run_region_pipeline()` actually passes as `marker_list` when classifying
+Optic Tract samples (hippocampus continues to use the full, unrestricted
+`atlas_index_markers`).
+
+This was not the first response to the problem. Both panels were initially
+left in as candidates everywhere, on the assumption that the argmax
+mechanism itself would suppress them in a region where they don't belong --
+the same mechanism that gives the Purkinje and RGC sanity-check panels
+~0% in the wrong region. Instead, the first Optic Tract composition chart
+(2026-09-24) showed both reading at non-trivial, non-incidental
+percentages (Dentate gyrus granule ~8.9-9.7%, Hippocampal pyramidal
+~5.7-6.7%) -- too high to be background noise given neither cell type has
+any anatomical basis for being in a white matter tract.
+
+A two-part diagnostic (2026-09-28) distinguished two possible causes --
+near-tie noise (the same failure mode already found and being addressed
+for the RGC/BAM panels) versus genuine marker cross-reactivity (the same
+failure mode already found for RGC's Sncg gene) -- and found the second:
+
+- **classification_margin ruled out noise.** Cells classified as either
+  panel had a median margin of 1.9-2.4, and 0% of them would flip to
+  Unclassified under any candidate confidence-filter threshold up to 1.0.
+  These were among the most confident calls the classifier made, not
+  borderline ones -- so the pending classification_margin recalibration
+  (needed for RGC/BAM) does not touch this problem at all.
+- **Per-gene detection rates identified the driver gene in each panel.**
+  For Hippocampal pyramidal, Fibcd1/Spink8/Rab38 were at 0% detection in
+  every single Optic Tract sample, and Hes1/Hcn1/Map3k15 were low/spotty --
+  but Pou3f1 was detected in 50-100% of these cells in every sample.
+  Pou3f1 (Oct-6/SCIP) has a well-established role in oligodendrocyte/
+  Schwann cell myelination and is biologically expected to be active in a
+  heavily myelinated white matter tract; it is not hippocampus-specific.
+  For Dentate gyrus granule, Slc17a7 was near-absent but Prox1 was at
+  100% detection in every sample -- since it's a 2-gene panel, Prox1 alone
+  was generating every one of these calls. Prox1 is not DG-restricted
+  brain-wide (it also marks e.g. Prox1+ interneuron populations found
+  scattered through adult white matter).
+- **runner_up confirmed the biological direction of the error.**
+  Oligodendrocyte lineage was the dominant runner-up for both panels
+  (29% of Hippocampal pyramidal calls, 45% of Dentate gyrus granule
+  calls) -- consistent with real oligodendrocyte-lineage cells losing the
+  argmax to these false-positive calls, which also explains why dropping
+  the two panels was expected to (and did) raise Oligodendrocyte lineage's
+  share of the Optic Tract composition.
+
+GABAergic interneuron was evaluated against the same question and kept as
+an Optic Tract candidate: Gad1/Gad2/Slc32a1 are not hippocampus-restricted
+markers to begin with (inhibitory interneurons are present throughout the
+CNS, including along white matter tracts), and it did not show the
+low-diversity single-gene-driver pattern found above.
 
 | State refinement | Active / Mature panel | Homeostatic / Precursor panel |
 |---|---|---|

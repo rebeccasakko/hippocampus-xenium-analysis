@@ -26,6 +26,29 @@ atlas_index_markers <- list(
     `RGC (sanity check)`         = c("Pou4f1", "Sncg")
 )
 
+# -- Region-specific candidate panel set: Optic Tract --
+# Drops Hippocampal pyramidal and Dentate gyrus granule from the argmax
+# competition for optic tract only (hippocampus keeps the full list above).
+# Confirmed 2026-09-28 via classification_margin + per-gene detection-rate
+# diagnostics that these were NOT near-tie noise (median margin 1.9-2.4;
+# 0% of these calls would flip under any margin threshold <=1.0) but
+# genuine gene-overlap false positives: each panel's truly hippocampus-
+# specific genes never fire in optic tract in any sample (Fibcd1/Spink8/
+# Rab38 all at 0% detection for Hippocampal pyramidal), while one shared,
+# non-specific gene in each panel fires and wins the argmax alone --
+# Pou3f1 (a myelination-associated TF, biologically expected in white
+# matter) at 50-100% detection for Hippocampal pyramidal, and Prox1 (not
+# actually DG-restricted brain-wide) at 100% detection for Dentate gyrus
+# granule. runner_up for both was dominated by Oligodendrocyte lineage
+# (29% and 45% of the misclassified cells respectively) -- real
+# oligodendrocyte-lineage cells were losing the argmax call to these false
+# positives. GABAergic interneuron was kept as an Optic Tract candidate:
+# Gad1/Gad2/Slc32a1 aren't hippocampus-restricted and didn't show this
+# problem. See protocols/classification_protocol.md.
+optic_tract_markers <- atlas_index_markers
+optic_tract_markers[["Hippocampal pyramidal"]] <- NULL
+optic_tract_markers[["Dentate gyrus granule"]] <- NULL
+
 astro_active_markers <- c("Gfap", "Serpina3n")
 astro_homeostatic_markers <- c("Aldh1l1", "Sox9")
 microglia_active_markers <- c("Trem2", "Cst7", "Lpl")

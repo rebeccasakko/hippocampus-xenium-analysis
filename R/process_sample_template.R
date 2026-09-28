@@ -1,7 +1,8 @@
 process_hippocampus_sample <-
 function(data_dir, lasso_csv, sample_id, group_id,
                                        region = "Hippocampus",
-                                       min_count = 10, min_feature = 5) {
+                                       min_count = 10, min_feature = 5,
+                                       marker_list = atlas_index_markers) {
     
     xenium <- LoadXenium(data_dir, fov = "fov")
     xenium <- subset(xenium, subset = nCount_Xenium >= min_count & nFeature_Xenium >= min_feature)
@@ -18,5 +19,5 @@ function(data_dir, lasso_csv, sample_id, group_id,
     obj$region    <- region
     rm(xenium); gc()
     
-    classify_atlas_index(obj)
+    classify_atlas_index(obj, marker_list = marker_list)
 }

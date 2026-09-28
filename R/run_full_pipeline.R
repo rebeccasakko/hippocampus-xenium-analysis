@@ -17,13 +17,17 @@
 # matter, won't have dentate gyrus granule or GABAergic interneuron
 # cells the way hippocampus does).
 #
-# Classification itself (classify_atlas_index()) needs NO changes
-# between regions: it's a per-cell argmax over the same 13 atlas
-# panels regardless of region, and panels for cell types genuinely
-# absent from a region's tissue just don't win the argmax for any
-# cell there (the same mechanism that already gives the Purkinje
-# sanity check ~0% in hippocampus). See protocols/classification_
-# protocol.md.
+# Classification itself (classify_atlas_index()) mostly needs no changes
+# between regions: it's a per-cell argmax over the same atlas panels
+# regardless of region, and panels for cell types genuinely absent from a
+# region's tissue mostly just don't win the argmax for any cell there (the
+# same mechanism that gives the Purkinje sanity check ~0% in hippocampus).
+# One confirmed exception: Hippocampal pyramidal and Dentate gyrus granule
+# had to be dropped from the candidate list specifically for Optic Tract
+# (optic_tract_markers in R/marker_panels.R) after a 2026-09-28 diagnostic
+# showed they were winning the argmax there via a shared non-specific gene
+# (Pou3f1, Prox1), not via real signal -- see protocols/classification_
+# protocol.md for the full writeup and diagnostic.
 #
 # This script is a map of how the pieces fit together, not something
 # meant to run unattended in one click. EDIT THE CONFIG SECTIONS below
@@ -76,7 +80,8 @@ source("R/plot_de_heatmap.R")
 #   output_dir   -- e.g. "outputs/hippocampus" -- kept separate per
 #                   region so runs don't overwrite each other
 # ============================================================
-run_region_pipeline <- function(sample_base, lasso_map, region_label, de_cell_types, output_dir) {
+run_region_pipeline <- function(sample_base, lasso_map, region_label, de_cell_types, output_dir,
+                                 marker_list = atlas_index_markers) {
 
     dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
 
@@ -92,11 +97,12 @@ run_region_pipeline <- function(sample_base, lasso_map, region_label, de_cell_ty
         row <- sample_config[i, ]
         message("\n==== ", region_label, ": processing ", row$sample_id, " ====")
         process_hippocampus_sample(
-            data_dir  = row$data_dir,
-            lasso_csv = row$lasso_csv,
-            sample_id = row$sample_id,
-            group_id  = row$group_id,
-            region    = region_label
+            data_dir    = row$data_dir,
+            lasso_csv   = row$lasso_csv,
+            sample_id   = row$sample_id,
+            group_id    = row$group_id,
+            region      = region_label,
+            marker_list = marker_list
         )
     })
     names(sample_objects) <- sample_config$sample_id
@@ -206,6 +212,12 @@ hippocampus_de_cell_types <- list(
 # Oligodendrocyte lineage has no candidate panel defined yet -- add
 # one to R/de_candidate_panels.R and a new entry below once you have
 # literature-backed candidates for it.
+#
+# Classification itself also uses a region-specific candidate list here:
+# optic_tract_markers (R/marker_panels.R) drops Hippocampal pyramidal and
+# Dentate gyrus granule, confirmed 2026-09-28 to be gene-overlap false
+# positives in this region rather than real signal -- see
+# protocols/classification_protocol.md.
 # ============================================================
 optic_tract_lassos <- c(
     gi_1_b  = "~/Desktop/optic_tract_gi_1_b.csv",
@@ -230,4 +242,5 @@ hippocampus_results <- run_region_pipeline(
 
 optic_tract_results <- run_region_pipeline(
     sample_base, optic_tract_lassos, "Optic Tract",
-    optic_tract_de_cell_types, "outputs/optic_tract")
+    optic_tract_de_cell_types, "outputs/optic_tract",
+    marker_list = optic_tract_markers)
