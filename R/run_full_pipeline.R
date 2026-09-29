@@ -61,6 +61,7 @@ source("R/de_candidate_panels.R")
 source("R/run_pseudobulk_de.R")
 source("R/run_wilcox_de.R")
 source("R/plot_de_heatmap.R")
+source("R/build_stats_table.R")
 
 # ============================================================
 # run_region_pipeline(): stages 1-5 for one brain region.
