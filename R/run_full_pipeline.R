@@ -62,6 +62,7 @@ source("R/run_pseudobulk_de.R")
 source("R/run_wilcox_de.R")
 source("R/plot_de_heatmap.R")
 source("R/build_stats_table.R")
+source("R/check_marker_spillover.R")
 
 # ============================================================
 # run_region_pipeline(): stages 1-5 for one brain region.
