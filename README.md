@@ -101,9 +101,17 @@ unit (n = 3 per group).
   Serpina3n is largely oligodendrocyte-expressed in white matter. The
   buckets are best read as marker-high versus marker-low. The combined
   astrocyte total is reported alongside the split.
-- Near-tie rates are high for Choroid plexus, Neutrophil, GABAergic
-  interneuron, Peripheral macrophage and B cell; their composition values are
-  the least reliable.
+- Sensitivity to near-tie handling (Optic Tract; see
+  outputs/optic_tract_near_tie_sensitivity.csv): the TBI-minus-sham difference
+  in composition changed sign when near-tie cells were reassigned to
+  Unclassified for Unclassified, Neutrophil, B cell, Choroid plexus and
+  Peripheral macrophage (shifts of 2.5 to 6.7 percentage points). Group
+  differences in these five categories are not robust and are not
+  interpreted. All other categories kept their direction, and the largest
+  (Mature oligodendrocyte, Homeostatic microglia, Homeostatic astrocyte,
+  Precursor oligodendrocyte, Endothelial) were unchanged between runs.
+  (Pericyte/vascular SMC changed sign in the all-category run by 0.2
+  percentage points, which is negligible.)
 - Marker spillover from neighbouring cells (segmentation) can contribute to
   signal for some genes.
 
