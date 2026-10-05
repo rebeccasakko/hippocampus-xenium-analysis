@@ -144,3 +144,15 @@ unit (n = 3 per group).
 Raw Xenium output and lasso CSV files are not tracked in this repository
 (unpublished research data; see .gitignore). They are stored on the lab's
 external drive.
+- Sensitivity to near-tie handling (Optic Tract; see
+  outputs/optic_tract_near_tie_sensitivity.csv): the TBI-minus-sham difference
+  in composition changed sign when near-tie cells were reassigned to
+  Unclassified for Unclassified, Neutrophil, B cell, Choroid plexus and
+  Peripheral macrophage (shifts of 2.5 to 6.7 percentage points). Group
+  differences in these five categories are not robust and are not
+  interpreted. All other categories kept their direction, and the largest
+  (Mature oligodendrocyte, Homeostatic microglia, Homeostatic astrocyte,
+  Precursor oligodendrocyte, Endothelial) were unchanged between runs.
+  (Pericyte/vascular SMC changed sign in the all-category run by 0.2
+  percentage points, which is negligible.)
+  
