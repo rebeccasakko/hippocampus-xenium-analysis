@@ -2,9 +2,9 @@ build_cell_count_table <- function(sample_list, region = NA_character_, run = "p
                                    lasso_area_um2 = NULL, out_file = NULL) {
   tab <- data.frame(
     sample = names(sample_list),
-    n_cells = vapply(sample_list, ncol, integer(1)),
+    n_cells = vapply(sample_list, function(o) as.integer(ncol(o)), integer(1)),
     n_unclassified = vapply(sample_list,
-                            function(o) sum(o$cell_type == "Unclassified", na.rm = TRUE),
+                            function(o) as.integer(sum(o$cell_type == "Unclassified", na.rm = TRUE)),
                             integer(1)),
     row.names = NULL)
   tab$pct_unclassified <- round(100 * tab$n_unclassified / tab$n_cells, 1)
@@ -18,4 +18,5 @@ build_cell_count_table <- function(sample_list, region = NA_character_, run = "p
   }
   
   if (!is.null(out_file)) write.csv(tab, out_file, row.names = FALSE)
+  tab
 }
