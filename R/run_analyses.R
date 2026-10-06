@@ -102,3 +102,22 @@ write.csv(robustness_table(optic_tract_results, optic_tract_sens_global, optic_t
 # ---- Composition stats: Welch t-test + BH, sample as the unit ----
 write.csv(build_stats_table(hippocampus_results$composition$composition_df),
           "outputs/hippocampus_unfiltered_stats_table.csv", row.names = FALSE)
+# ---- Diagnostics: single-gene driver checks, hippocampus (2026-10-06) ----
+# Choroid plexus: Kl alone (66-98% of calls; Folr1/Otx2 ~1%), ~74% neuronal
+#   runner-up, median margin 2.41, cells lie along pyramidal/DG layers ->
+#   Kl-positive neurons, not choroid plexus.
+# Ependymal/ciliated: mostly Foxj1-driven, but some calls line the outer
+#   (ventricular) edge -> mixed real edge cells + scattered noise.
+hc_objs <- hippocampus_results$sample_objects
+
+write.csv(driver_check(hc_objs, "Choroid plexus", c("Folr1", "Kl", "Otx2")),
+          "outputs/hippocampus_choroid_plexus_gene_detection.csv", row.names = FALSE)
+write.csv(runner_up_summary(hc_objs, "Choroid plexus"),
+          "outputs/hippocampus_choroid_plexus_runner_up.csv", row.names = FALSE)
+plot_category_spatial(hc_objs, "Choroid plexus", "outputs/hippocampus_choroid_plexus_spatial.png")
+
+write.csv(driver_check(hc_objs, "Ependymal/ciliated", c("Foxj1", "Pifo", "Dnah12")),
+          "outputs/hippocampus_ependymal_gene_detection.csv", row.names = FALSE)
+write.csv(runner_up_summary(hc_objs, "Ependymal/ciliated"),
+          "outputs/hippocampus_ependymal_runner_up.csv", row.names = FALSE)
+plot_category_spatial(hc_objs, "Ependymal/ciliated", "outputs/hippocampus_ependymal_spatial.png")

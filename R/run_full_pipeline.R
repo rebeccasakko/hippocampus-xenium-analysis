@@ -65,6 +65,7 @@ source("R/plot_de_heatmap.R")
 source("R/build_stats_table.R")
 source("R/check_marker_spillover.R")
 source("R/plot_lasso_overview.R")
+source("R/check_driver_genes.R")
 
 # Area (um^2) of the lasso polygon(s) in a Xenium Explorer selection CSV
 # (2 comment lines, then Selection, X, Y, Class, Color). Returns NA if the
