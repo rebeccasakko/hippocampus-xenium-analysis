@@ -64,6 +64,7 @@ source("R/run_wilcox_de.R")
 source("R/plot_de_heatmap.R")
 source("R/build_stats_table.R")
 source("R/check_marker_spillover.R")
+source("R/plot_lasso_overview.R")
 
 # Area (um^2) of the lasso polygon(s) in a Xenium Explorer selection CSV
 # (2 comment lines, then Selection, X, Y, Class, Color). Returns NA if the
@@ -121,6 +122,10 @@ run_region_pipeline <- function(sample_base, lasso_map, region_label, de_cell_ty
     stop("lasso_map is missing an entry for: ",
          paste(sample_config$sample_id[is.na(sample_config$lasso_csv)], collapse = ", "))
   }
+  
+  # Lasso overview: each outline drawn over its sample's cells (mapping check)
+  plot_lasso_overview(sample_base, lasso_map, region_label,
+                      file.path(output_dir, "lasso_overview.png"))
   
   # ---- Stage 1: per-sample load -> QC -> normalize -> lasso-restrict -> classify ----
   if (is.null(prefilter_objects)) {

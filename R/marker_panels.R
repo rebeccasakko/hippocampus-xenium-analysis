@@ -82,6 +82,13 @@ optic_tract_markers[["Dentate gyrus granule"]] <- NULL
 optic_tract_markers[["RGC (sanity check)"]] <- NULL
 optic_tract_markers[["Ependymal/ciliated"]] <- NULL
 
+# Hippocampus uses the 13 original panels: drop the optic-tract-only panels
+hippocampus_markers <- atlas_index_markers
+for (p in c("Peripheral macrophage", "T cell", "Neutrophil", "NK cell",
+            "B cell", "Dendritic cell", "RGC (sanity check)")) {
+  hippocampus_markers[[p]] <- NULL
+}
+
 astro_active_markers <- c("Gfap", "Serpina3n")
 astro_homeostatic_markers <- c("Aldh1l1", "Sox9")
 microglia_active_markers <- c("Trem2", "Cst7", "Lpl")
