@@ -17,10 +17,14 @@
 setwd("~/Documents/GitHub/hippocampus-xenium-analysis")
 source("R/run_full_pipeline.R")   # setup only: functions, panels, lassos
 
-# ---- Hippocampus (13 panels; run 2026-10-06) ----
-# Pooled 15th-percentile margin = 0.186. Near-tie (% of cells below it):
-# BAM 73.0, Ependymal/ciliated 42.3, Microglia (Active) 20.5.
-# Choroid plexus 14.9 = borderline, not included (rule applied as stated).
+# ---- Hippocampus (12 panels; Choroid plexus excluded 2026-10-06) ----
+# Choroid plexus removed after driver-gene diagnostics (see Diagnostics
+# section below). The earlier 13-panel runs are kept for comparison in
+# outputs/hippocampus_*_withCP/ (threshold 0.186; near-tie: BAM 73.0%,
+# Ependymal/ciliated 42.3%, Microglia (Active) 20.5%; Choroid plexus 14.9%).
+# 12-panel runs: pooled 15th-percentile margin = 0.1745; near-tie list
+# unchanged: BAM 73.8%, Ependymal/ciliated 42.3%, Microglia (Active) 22.7%
+# (next highest: Fibroblast/meningeal 12.8%).
 
 hippocampus_results <- run_region_pipeline(
   sample_base, hippocampus_lassos, "Hippocampus",
@@ -102,13 +106,16 @@ write.csv(robustness_table(optic_tract_results, optic_tract_sens_global, optic_t
 # ---- Composition stats: Welch t-test + BH, sample as the unit ----
 write.csv(build_stats_table(hippocampus_results$composition$composition_df),
           "outputs/hippocampus_unfiltered_stats_table.csv", row.names = FALSE)
+
 # ---- Diagnostics: single-gene driver checks, hippocampus (2026-10-06) ----
 # Choroid plexus: Kl alone (66-98% of calls; Folr1/Otx2 ~1%), ~74% neuronal
 #   runner-up, median margin 2.41, cells lie along pyramidal/DG layers ->
-#   Kl-positive neurons, not choroid plexus.
+#   Kl-positive neurons, not choroid plexus. Excluded from the hippocampus panel.
 # Ependymal/ciliated: mostly Foxj1-driven, but some calls line the outer
-#   (ventricular) edge -> mixed real edge cells + scattered noise.
-hc_objs <- hippocampus_results$sample_objects
+#   (ventricular) edge -> mixed real edge cells + scattered noise. Kept;
+#   reported as not robust.
+# Uses the 13-panel run (before Choroid plexus was excluded):
+hc_objs <- readRDS("outputs/hippocampus_unfiltered_withCP/sample_objects_prefilter.rds")
 
 write.csv(driver_check(hc_objs, "Choroid plexus", c("Folr1", "Kl", "Otx2")),
           "outputs/hippocampus_choroid_plexus_gene_detection.csv", row.names = FALSE)

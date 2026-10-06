@@ -88,6 +88,12 @@ for (p in c("Peripheral macrophage", "T cell", "Neutrophil", "NK cell",
             "B cell", "Dendritic cell", "RGC (sanity check)")) {
   hippocampus_markers[[p]] <- NULL
 }
+# Choroid plexus excluded from hippocampus (2026-10-06): calls were Kl-driven
+# (Folr1/Otx2 ~1% of calls), ~74% had a neuronal runner-up, and the cells lay
+# along the pyramidal/DG layers -> Kl-positive neurons, not choroid plexus.
+# Evidence: outputs/hippocampus_choroid_plexus_*. Ependymal/ciliated is kept:
+# mixed signal (some calls line the ventricular edge), reported as not robust.
+hippocampus_markers[["Choroid plexus"]] <- NULL
 
 astro_active_markers <- c("Gfap", "Serpina3n")
 astro_homeostatic_markers <- c("Aldh1l1", "Sox9")
