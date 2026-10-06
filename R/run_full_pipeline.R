@@ -123,9 +123,11 @@ run_region_pipeline <- function(sample_base, lasso_map, region_label, de_cell_ty
          paste(sample_config$sample_id[is.na(sample_config$lasso_csv)], collapse = ", "))
   }
   
-  # Lasso overview: each outline drawn over its sample's cells (mapping check)
-  plot_lasso_overview(sample_base, lasso_map, region_label,
-                      file.path(output_dir, "lasso_overview.png"))
+  # Lasso overview (primary run only; sensitivity runs use the same lassos)
+  if (is.null(prefilter_objects)) {
+    plot_lasso_overview(sample_base, lasso_map, region_label,
+                        file.path(output_dir, "lasso_overview.png"))
+  }
   
   # ---- Stage 1: per-sample load -> QC -> normalize -> lasso-restrict -> classify ----
   if (is.null(prefilter_objects)) {
@@ -324,31 +326,7 @@ optic_tract_de_cell_types <- list(
 )
 
 # ============================================================
-# RUN -- one call per region/run. Comment out whichever isn't needed.
+# The analysis runs live in R/run_analyses.R.
+# This file is setup only and is safe to source():
+#   source("R/run_full_pipeline.R")
 # ============================================================
-
-# Hippocampus is already done and reported, so it is commented out to
-# avoid reloading six large samples. Un-comment to rerun it.
-# hippocampus_results <- run_region_pipeline(
-#     sample_base, hippocampus_lassos, "Hippocampus",
-#     hippocampus_de_cell_types, "outputs/hippocampus")
-
-# Optic Tract, PRIMARY run: confidence filter applied to BAM only.
-optic_tract_results <- run_region_pipeline(
-  sample_base, optic_tract_lassos, "Optic Tract",
-  optic_tract_de_cell_types, "outputs/optic_tract_newlasso",
-  marker_list = optic_tract_markers,
-  confidence_percentile = 0.15,
-  confidence_categories = "BAM",
-  run_label = "primary")
-
-# Optic Tract, SENSITIVITY run: same samples and lassos, global filter
-# (all cell types). Reuses the primary run's loaded samples, so no reload.
-optic_tract_sens_results <- run_region_pipeline(
-  sample_base, optic_tract_lassos, "Optic Tract",
-  optic_tract_de_cell_types, "outputs/optic_tract_newlasso_sens_global",
-  marker_list = optic_tract_markers,
-  confidence_percentile = 0.15,
-  confidence_categories = NULL,
-  run_label = "sens_global",
-  prefilter_objects = optic_tract_results$sample_objects_prefilter)

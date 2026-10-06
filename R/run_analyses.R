@@ -1,0 +1,104 @@
+# ============================================================
+# run_analyses.R -- the analysis runs behind the reported results.
+# Run ONE block at a time (each is heavy). In each region the PRIMARY
+# run must come first: the sensitivity runs reuse its loaded samples
+# ($sample_objects_prefilter), so they don't reload raw data.
+#
+# Design (both regions):
+#   primary       -- unfiltered (no confidence filter)
+#   sens_global   -- cells below the region's pooled 15th-percentile
+#                    classification_margin -> Unclassified, all categories
+#   sens_neartie  -- same threshold, only in categories where >15% of
+#                    cells fall below it in the primary run
+# Thresholds and near-tie lists were derived from pooled margins
+# (all 6 samples) without group labels.
+# ============================================================
+
+setwd("~/Documents/GitHub/hippocampus-xenium-analysis")
+source("R/run_full_pipeline.R")   # setup only: functions, panels, lassos
+
+# ---- Hippocampus (13 panels; run 2026-10-06) ----
+# Pooled 15th-percentile margin = 0.186. Near-tie (% of cells below it):
+# BAM 73.0, Ependymal/ciliated 42.3, Microglia (Active) 20.5.
+# Choroid plexus 14.9 = borderline, not included (rule applied as stated).
+
+hippocampus_results <- run_region_pipeline(
+  sample_base, hippocampus_lassos, "Hippocampus",
+  hippocampus_de_cell_types, "outputs/hippocampus_unfiltered",
+  marker_list = hippocampus_markers,
+  run_label = "primary")
+
+hippocampus_sens_global <- run_region_pipeline(
+  sample_base, hippocampus_lassos, "Hippocampus",
+  hippocampus_de_cell_types, "outputs/hippocampus_sens_global",
+  marker_list = hippocampus_markers,
+  confidence_percentile = 0.15,
+  confidence_categories = NULL,
+  run_label = "sens_global",
+  prefilter_objects = hippocampus_results$sample_objects_prefilter)
+
+hippocampus_near_tie_cats <- c("BAM", "Ependymal/ciliated", "Microglia (Active)")
+
+hippocampus_sens_neartie <- run_region_pipeline(
+  sample_base, hippocampus_lassos, "Hippocampus",
+  hippocampus_de_cell_types, "outputs/hippocampus_sens_neartie",
+  marker_list = hippocampus_markers,
+  confidence_percentile = 0.15,
+  confidence_categories = hippocampus_near_tie_cats,
+  run_label = "sens_neartie",
+  prefilter_objects = hippocampus_results$sample_objects_prefilter)
+
+# ---- Optic tract (16 panels; Sakthi's new lassos) ----
+
+optic_tract_results <- run_region_pipeline(
+  sample_base, optic_tract_lassos, "Optic Tract",
+  optic_tract_de_cell_types, "outputs/optic_tract_newlasso_unfiltered",
+  marker_list = optic_tract_markers,
+  run_label = "primary")
+
+optic_tract_sens_global <- run_region_pipeline(
+  sample_base, optic_tract_lassos, "Optic Tract",
+  optic_tract_de_cell_types, "outputs/optic_tract_newlasso_sens_global",
+  marker_list = optic_tract_markers,
+  confidence_percentile = 0.15,
+  confidence_categories = NULL,
+  run_label = "sens_global",
+  prefilter_objects = optic_tract_results$sample_objects_prefilter)
+
+optic_tract_near_tie_cats <- c("Choroid plexus", "Neutrophil", "GABAergic interneuron",
+                               "Peripheral macrophage", "B cell", "BAM")
+
+optic_tract_sens_neartie <- run_region_pipeline(
+  sample_base, optic_tract_lassos, "Optic Tract",
+  optic_tract_de_cell_types, "outputs/optic_tract_newlasso_sens_neartie",
+  marker_list = optic_tract_markers,
+  confidence_percentile = 0.15,
+  confidence_categories = optic_tract_near_tie_cats,
+  run_label = "sens_neartie",
+  prefilter_objects = optic_tract_results$sample_objects_prefilter)
+
+# ---- Robustness tables: TBI (gi) minus sham (gii), percentage points ----
+# "flips" = direction changes in at least one sensitivity run.
+robustness_table <- function(primary, global, neartie) {
+  diff_tbl <- function(res) {
+    cd <- res$composition$composition_df
+    a <- tapply(cd$pct, list(cd$cell_type, cd$group_id), mean)
+    round(a[, "gi"] - a[, "gii"], 2)
+  }
+  d1 <- diff_tbl(primary); d2 <- diff_tbl(global); d3 <- diff_tbl(neartie)
+  cats <- union(union(names(d1), names(d2)), names(d3))
+  out <- data.frame(cell_type = cats, unfiltered = d1[cats], global = d2[cats],
+                    neartie = d3[cats], row.names = NULL)
+  out$flips <- with(out, sign(global) != sign(unfiltered) | sign(neartie) != sign(unfiltered))
+  out$max_shift <- with(out, pmax(abs(global - unfiltered), abs(neartie - unfiltered)))
+  out[order(-out$max_shift), ]
+}
+
+write.csv(robustness_table(hippocampus_results, hippocampus_sens_global, hippocampus_sens_neartie),
+          "outputs/hippocampus_near_tie_sensitivity.csv", row.names = FALSE)
+write.csv(robustness_table(optic_tract_results, optic_tract_sens_global, optic_tract_sens_neartie),
+          "outputs/optic_tract_near_tie_sensitivity.csv", row.names = FALSE)
+
+# ---- Composition stats: Welch t-test + BH, sample as the unit ----
+write.csv(build_stats_table(hippocampus_results$composition$composition_df),
+          "outputs/hippocampus_unfiltered_stats_table.csv", row.names = FALSE)
