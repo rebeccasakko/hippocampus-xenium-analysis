@@ -47,3 +47,5 @@ rsconnect/
 # Data files - do not track
 *.rds
 *.csv
+
+.DS_Store
