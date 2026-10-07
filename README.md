@@ -148,11 +148,8 @@ unit (n = 3 per group).
 - gi_2_d BAM: 0 cells under the detection floor in an earlier run, 264 in
   the current run; confirm which cells the 0.5% floor is calculated on.
 - Robustness to the percentile choice (10th and 25th, alongside the 15th).
-- DESeq2 resultsNames() lists the coefficient as gii_vs_gi, but reported fold
-  changes are TBI relative to sham (checked against group means); confirm the
-  contrast is set explicitly in R/run_pseudobulk_de.R.
-- R/build_stats_table.R: replace the deprecated cur_data() with
-  pick(everything()).
+- Optic Tract composition bar charts: redraw with the corrected plotting code
+  (fixed 2026-10-07) when the optic tract runs are next repeated.
 - Sources for the optic-tract immune panels.
 - Exploratory astrocyte-only state analysis using a pre-specified,
   literature-derived gene set (sample as unit).
