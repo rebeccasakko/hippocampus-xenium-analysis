@@ -81,27 +81,31 @@ weight in proportion to how many genes are actually driving it.
 
 ## Results summary (padj < 0.05)
 
-| Cell type | Wilcoxon (full panel) sig. genes | Pseudobulk candidate panel |
-|---|---|---|
-| Dentate gyrus granule | 24 | Null -- Id2 trending (padj=0.056, raw p=0.019, same direction as Wilcoxon) |
-| Astrocyte | 9 | Null |
-| Microglia | 4 | **P2ry13 significant** (matches Wilcoxon result, same direction) |
-| GABAergic interneuron | 1 | Null |
+Hippocampus, 12-panel primary run (2026-10-07). Full tables in
+`outputs/hippocampus_unfiltered/de/`. Fold changes are TBI relative to
+sham (positive = higher in TBI), confirmed against group means.
 
-**The two findings that matter most:** P2ry13 (microglia) is significant
-under both methods -- the strongest single result in the dataset, because
-it does not depend on trusting one method over the other. Id2 (dentate
-gyrus) is significant under Wilcoxon and trends the same direction under
-the stricter pseudobulk test, just short of its own significance
-threshold -- worth noting as a "real signal, not yet enough animal-level
-power to confirm" example rather than a contradiction between methods.
-Every other Wilcoxon hit (the other 8 astro genes, 3 microglia genes, 23
-dg genes, the 1 gaba gene) has no independent corroboration from the
-mouse-level test, consistent with the pseudoreplication caveat above.
+| Cell type | Wilcoxon (full panel) sig. genes | Pseudobulk genome-wide | Pseudobulk candidate panel |
+|---|---|---|---|
+| Dentate gyrus granule | 23 | **Ddit4** (padj = 0.004, higher in TBI) | **Id2** (padj = 0.048, higher in TBI) |
+| Astrocyte | 9 | Null | Null (Sox9 raw p = 0.028, padj = 0.19) |
+| Microglia | 4 | Null | **P2ry13** (padj = 0.015, lower in TBI) |
+| GABAergic interneuron | 1 | Null | Null |
+
+**Findings that survive both methods:** Ddit4 (dentate gyrus) is the only
+gene significant in the genome-wide mouse-level test, and is also
+significant under Wilcoxon. P2ry13 (microglia) is significant in the
+candidate panel and under Wilcoxon, lower in TBI, consistent with reduced
+expression of a homeostatic microglial marker after injury. Id2 (dentate
+gyrus) is significant in the candidate panel (padj = 0.048, just below the
+threshold) and under Wilcoxon, higher in TBI. Every other Wilcoxon hit has
+no independent corroboration from the mouse-level test, consistent with
+the pseudoreplication caveat above.
 
 ## Bottom line
 
 The two methods are not in conflict so much as answering different
 questions at different levels of rigor: "does this hold up mouse-to-mouse"
 (pseudobulk) versus "is there any detectable cell-level shift, however it
-arose" (Wilcoxon). Report both, and lead with genes that survive both.
+arose" (Wilcoxon). Report both, and lead with the genes that survive both:
+Ddit4, P2ry13 and Id2.

@@ -148,8 +148,9 @@ unit (n = 3 per group).
 - gi_2_d BAM: 0 cells under the detection floor in an earlier run, 264 in
   the current run; confirm which cells the 0.5% floor is calculated on.
 - Robustness to the percentile choice (10th and 25th, alongside the 15th).
-- Update the DE results summary in protocols/differential_expression_protocol.md
-  from the 12-panel runs, and save DE result tables to outputs/.
+- DESeq2 resultsNames() lists the coefficient as gii_vs_gi, but reported fold
+  changes are TBI relative to sham (checked against group means); confirm the
+  contrast is set explicitly in R/run_pseudobulk_de.R.
 - R/build_stats_table.R: replace the deprecated cur_data() with
   pick(everything()).
 - Sources for the optic-tract immune panels.
