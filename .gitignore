@@ -49,3 +49,7 @@ rsconnect/
 *.csv
 
 .DS_Store
+
+# Allow summary tables in outputs/
+!outputs/*.csv
+!outputs/**/*.csv

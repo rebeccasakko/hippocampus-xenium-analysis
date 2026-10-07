@@ -1,0 +1,91 @@
+"sample_id","group_id","cell_type","n_cells","total_cells","pct","replicate_num"
+"gi_1_b","gi","Unclassified",791,5425,14.5806451612903,1
+"gi_1_b","gi","Microglia (Active)",31,5425,0.571428571428571,1
+"gi_1_b","gi","Astrocyte (Homeostatic)",251,5425,4.62672811059908,1
+"gi_1_b","gi","Dentate gyrus granule",1242,5425,22.8940092165899,1
+"gi_1_b","gi","GABAergic interneuron",415,5425,7.64976958525346,1
+"gi_1_b","gi","Fibroblast/meningeal",231,5425,4.25806451612903,1
+"gi_1_b","gi","Hippocampal pyramidal",863,5425,15.9078341013825,1
+"gi_1_b","gi","Astrocyte (Active)",250,5425,4.60829493087558,1
+"gi_1_b","gi","Microglia (Homeostatic)",233,5425,4.29493087557604,1
+"gi_1_b","gi","BAM",59,5425,1.08755760368664,1
+"gi_1_b","gi","Pericyte/vascular SMC",230,5425,4.23963133640553,1
+"gi_1_b","gi","Ependymal/ciliated",106,5425,1.95391705069124,1
+"gi_1_b","gi","Oligodendrocyte (Mature)",357,5425,6.58064516129032,1
+"gi_1_b","gi","Oligodendrocyte (Precursor)",159,5425,2.93087557603687,1
+"gi_1_b","gi","Endothelial",207,5425,3.81566820276498,1
+"gi_2_d","gi","Unclassified",882,6023,14.6438651834634,2
+"gi_2_d","gi","Microglia (Active)",45,6023,0.747135978748132,2
+"gi_2_d","gi","Astrocyte (Homeostatic)",245,6023,4.06774032873983,2
+"gi_2_d","gi","Dentate gyrus granule",1382,6023,22.9453760584426,2
+"gi_2_d","gi","GABAergic interneuron",483,6023,8.01925950522995,2
+"gi_2_d","gi","Fibroblast/meningeal",201,6023,3.33720737174166,2
+"gi_2_d","gi","Hippocampal pyramidal",1110,6023,18.4293541424539,2
+"gi_2_d","gi","Astrocyte (Active)",279,6023,4.63224306823842,2
+"gi_2_d","gi","Microglia (Homeostatic)",230,6023,3.81869500249045,2
+"gi_2_d","gi","BAM",57,6023,0.946372239747634,2
+"gi_2_d","gi","Pericyte/vascular SMC",257,6023,4.26697658973933,2
+"gi_2_d","gi","Ependymal/ciliated",94,6023,1.5606840444961,2
+"gi_2_d","gi","Oligodendrocyte (Mature)",352,6023,5.84426365598539,2
+"gi_2_d","gi","Oligodendrocyte (Precursor)",174,6023,2.88892578449278,2
+"gi_2_d","gi","Endothelial",232,6023,3.85190104599037,2
+"gi_3_f","gi","Unclassified",825,5644,14.6172927002126,3
+"gi_3_f","gi","Microglia (Active)",42,5644,0.744153082919915,3
+"gi_3_f","gi","Astrocyte (Homeostatic)",291,5644,5.15591778880227,3
+"gi_3_f","gi","Dentate gyrus granule",1266,5644,22.4309000708717,3
+"gi_3_f","gi","GABAergic interneuron",439,5644,7.77817150956768,3
+"gi_3_f","gi","Fibroblast/meningeal",220,5644,3.8979447200567,3
+"gi_3_f","gi","Hippocampal pyramidal",925,5644,16.3890857547838,3
+"gi_3_f","gi","Astrocyte (Active)",218,5644,3.86250885896527,3
+"gi_3_f","gi","Microglia (Homeostatic)",215,5644,3.80935506732814,3
+"gi_3_f","gi","BAM",68,5644,1.20481927710843,3
+"gi_3_f","gi","Pericyte/vascular SMC",268,5644,4.74840538625089,3
+"gi_3_f","gi","Ependymal/ciliated",107,5644,1.89581856839121,3
+"gi_3_f","gi","Oligodendrocyte (Mature)",346,5644,6.13040396881644,3
+"gi_3_f","gi","Oligodendrocyte (Precursor)",169,5644,2.99433026222537,3
+"gi_3_f","gi","Endothelial",245,5644,4.3408929836995,3
+"gii_1_a","gii","Unclassified",943,5827,16.1832847091128,1
+"gii_1_a","gii","Microglia (Active)",36,5827,0.617813626222756,1
+"gii_1_a","gii","Astrocyte (Homeostatic)",208,5827,3.56958984039815,1
+"gii_1_a","gii","Dentate gyrus granule",1422,5827,24.4036382357989,1
+"gii_1_a","gii","GABAergic interneuron",497,5827,8.52926033979749,1
+"gii_1_a","gii","Fibroblast/meningeal",173,5827,2.96893770379269,1
+"gii_1_a","gii","Hippocampal pyramidal",1021,5827,17.5218808992621,1
+"gii_1_a","gii","Astrocyte (Active)",282,5827,4.83954007207826,1
+"gii_1_a","gii","Microglia (Homeostatic)",207,5827,3.55242835078085,1
+"gii_1_a","gii","BAM",71,5827,1.21846576282821,1
+"gii_1_a","gii","Pericyte/vascular SMC",248,5827,4.2560494250901,1
+"gii_1_a","gii","Ependymal/ciliated",68,5827,1.16698129397632,1
+"gii_1_a","gii","Oligodendrocyte (Mature)",258,5827,4.42766432126309,1
+"gii_1_a","gii","Oligodendrocyte (Precursor)",190,5827,3.26068302728677,1
+"gii_1_a","gii","Endothelial",203,5827,3.48378239231165,1
+"gii_2_c","gii","Unclassified",942,6283,14.9928378163298,2
+"gii_2_c","gii","Microglia (Active)",31,6283,0.493394875059685,2
+"gii_2_c","gii","Astrocyte (Homeostatic)",231,6283,3.67658761738023,2
+"gii_2_c","gii","Dentate gyrus granule",1508,6283,24.0012732770969,2
+"gii_2_c","gii","GABAergic interneuron",509,6283,8.10122552920579,2
+"gii_2_c","gii","Fibroblast/meningeal",230,6283,3.66067165366863,2
+"gii_2_c","gii","Hippocampal pyramidal",1145,6283,18.2237784497851,2
+"gii_2_c","gii","Astrocyte (Active)",299,6283,4.75887314976922,2
+"gii_2_c","gii","Microglia (Homeostatic)",269,6283,4.28139423842114,2
+"gii_2_c","gii","BAM",53,6283,0.843546076714945,2
+"gii_2_c","gii","Pericyte/vascular SMC",270,6283,4.29731020213274,2
+"gii_2_c","gii","Ependymal/ciliated",86,6283,1.36877287919784,2
+"gii_2_c","gii","Oligodendrocyte (Mature)",338,6283,5.37959573452173,2
+"gii_2_c","gii","Oligodendrocyte (Precursor)",164,6283,2.61021804870285,2
+"gii_2_c","gii","Endothelial",208,6283,3.31052045201337,2
+"gii_3_e","gii","Unclassified",1108,7270,15.2407152682256,3
+"gii_3_e","gii","Microglia (Active)",43,7270,0.591471801925722,3
+"gii_3_e","gii","Astrocyte (Homeostatic)",328,7270,4.51169188445667,3
+"gii_3_e","gii","Dentate gyrus granule",1527,7270,21.0041265474553,3
+"gii_3_e","gii","GABAergic interneuron",592,7270,8.14305364511692,3
+"gii_3_e","gii","Fibroblast/meningeal",327,7270,4.49793672627235,3
+"gii_3_e","gii","Hippocampal pyramidal",1274,7270,17.5240715268226,3
+"gii_3_e","gii","Astrocyte (Active)",285,7270,3.92022008253095,3
+"gii_3_e","gii","Microglia (Homeostatic)",273,7270,3.75515818431912,3
+"gii_3_e","gii","BAM",68,7270,0.9353507565337,3
+"gii_3_e","gii","Pericyte/vascular SMC",343,7270,4.71801925722146,3
+"gii_3_e","gii","Ependymal/ciliated",126,7270,1.73314993122421,3
+"gii_3_e","gii","Oligodendrocyte (Mature)",471,7270,6.4786795048143,3
+"gii_3_e","gii","Oligodendrocyte (Precursor)",248,7270,3.41127922971114,3
+"gii_3_e","gii","Endothelial",257,7270,3.53507565337001,3

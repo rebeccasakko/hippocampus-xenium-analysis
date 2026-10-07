@@ -1,0 +1,20 @@
+"category","unfiltered","global","near_tie","flip_global","flip_near_tie","max_shift"
+"Unclassified",4.8,-1.92,-0.98,TRUE,TRUE,6.72
+"Neutrophil",-2.14,2.31,2.31,TRUE,TRUE,4.45
+"B cell",-0.19,2.85,2.85,TRUE,TRUE,3.04
+"Choroid plexus",2.4,-0.51,-0.51,TRUE,TRUE,2.9
+"Peripheral macrophage",-0.28,2.17,2.17,TRUE,TRUE,2.45
+"GABAergic interneuron",1.72,0.83,0.83,FALSE,FALSE,0.89
+"Dendritic cell",0.67,1.25,0.67,FALSE,FALSE,0.58
+"Microglia (Active)",-0.57,-0.12,-0.57,FALSE,FALSE,0.44
+"BAM",-0.23,-0.61,-0.61,FALSE,FALSE,0.38
+"Microglia (Homeostatic)",-2.38,-2.14,-2.38,FALSE,FALSE,0.24
+"Pericyte/vascular SMC",0.01,-0.21,0.01,TRUE,FALSE,0.22
+"Astrocyte (Active)",0.39,0.27,0.39,FALSE,FALSE,0.13
+"Astrocyte (Homeostatic)",-1.23,-1.31,-1.23,FALSE,FALSE,0.08
+"Fibroblast/meningeal",-0.37,-0.3,-0.37,FALSE,FALSE,0.07
+"Oligodendrocyte (Precursor)",1.13,1.16,1.13,FALSE,FALSE,0.03
+"Endothelial",-1.04,-1.04,-1.04,FALSE,FALSE,0
+"NK cell",-0.21,-0.21,-0.21,FALSE,FALSE,0
+"Oligodendrocyte (Mature)",-2.15,-2.15,-2.15,FALSE,FALSE,0
+"T cell",-0.32,-0.32,-0.32,FALSE,FALSE,0

@@ -1,0 +1,7 @@
+"sample","n_cells","n_unclassified","pct_unclassified","group","region","run","lasso_area_um2","cells_per_1000um2"
+"gi_1_b",5425,417,7.7,"gi","Hippocampus","sens_neartie",2128456.12423597,2.55
+"gi_2_d",6023,459,7.6,"gi","Hippocampus","sens_neartie",2240620.91884961,2.69
+"gi_3_f",5644,366,6.5,"gi","Hippocampus","sens_neartie",2175285.06175412,2.59
+"gii_1_a",5827,451,7.7,"gii","Hippocampus","sens_neartie",2014134.49587081,2.89
+"gii_2_c",6283,520,8.3,"gii","Hippocampus","sens_neartie",2415011.73021794,2.6
+"gii_3_e",7270,430,5.9,"gii","Hippocampus","sens_neartie",3219734.28348901,2.26
