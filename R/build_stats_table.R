@@ -2,11 +2,8 @@
 # Group comparison statistics: Welch's t-test + BH correction
 # per cell-type category (gi vs. gii)
 #
-# This is the step that produced the Hippocampus p-values already
-# shown to Sakthi (p=0.066 Hippocampal pyramidal, p=0.078 Astrocyte
-# Homeostatic), but it had only ever been run ad hoc in console and
-# was never saved as a function -- written up properly here
-# (2026-09-28) so the same method can be applied to Optic Tract and
+# First run interactively for the Hippocampus, then written up as a
+# function (2026-09-28) so the same method can be applied to Optic Tract and
 # both regions stay on record as using identical statistical
 # treatment, not just identical composition-summary code.
 #

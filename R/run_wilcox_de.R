@@ -1,10 +1,10 @@
 # ============================================================
-# Seurat FindMarkers Wilcoxon differential expression (primary analysis)
+# Secondary (exploratory) DE: Seurat FindMarkers, Wilcoxon, full gene panel
 #
 # Cell-level replication: every individual cell is treated as an
 # independent observation, tested across the FULL gene panel (no
 # candidate-list restriction). This is the method described in the
-# paper Sakthi shared, matched to its exact thresholds (logfc.threshold
+# Qiu et al. (2022, Front. Neurosci.), matched to its exact thresholds (logfc.threshold
 # = 0.25, min.pct = 0.1 -- Seurat's own defaults). Much higher power than
 # the pseudobulk approach in R/run_pseudobulk_de.R, at the cost of
 # pseudoreplication risk -- see protocols/differential_expression_

@@ -298,8 +298,8 @@ hippocampus_de_cell_types <- list(
 # positives in this region rather than real signal -- see
 # protocols/classification_protocol.md.
 #
-# LASSOS: from 2026-10-05 the optic tract uses Sakthi's NEW lassos
-# (Desktop/B6_Xenium_Opt). The file-to-sample pairing was checked by
+# LASSOS: from 2026-10-05 the optic tract uses redrawn, border-inclusive
+# lassos (Desktop/B6_Xenium_Opt). The file-to-sample pairing was checked by
 # overlaying each outline on its section (docs/optic_tract_new_lassos_overview.png).
 # The old lassos are kept below for reference only and are not used.
 # ============================================================

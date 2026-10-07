@@ -23,7 +23,8 @@ Mature/Precursor) using state-specific panels.
   by gene against the Xenium 5K panel. BAM and the state panels are
   literature-based curated deviations. Optic-tract immune panels:
   [TODO: source].
-- Hippocampus uses 13 candidate panels. The Optic Tract uses 16: the 13
+- Hippocampus uses 12 candidate panels: the 13 original panels minus Choroid
+  plexus (excluded 2026-10-06 after driver-gene diagnostics). The Optic Tract uses 16: the 13
   plus six immune panels (Peripheral macrophage, T cell, Neutrophil,
   NK cell, B cell, Dendritic cell), minus four hippocampus- or
   tract-inappropriate panels (Hippocampal pyramidal, Dentate gyrus granule,
@@ -45,7 +46,8 @@ are kept by point-in-polygon. Optic Tract lassos were replaced on 2026-10-05
 by new lassos drawn by a lab neuroscientist (one polygon per sample). Lasso
 areas range from about 49,000 to 227,000 square micrometres, so cell counts
 differ by sample; counts and cells per 1000 square micrometres are reported
-with every run.
+with every run. Each primary run also saves lasso_overview.png, showing every
+lasso drawn over its sample's cells, as a check of the file-to-sample mapping.
 
 ## Confidence filtering
 
@@ -61,20 +63,23 @@ select either. A finding is considered robust to near-tie handling if the
 direction of the TBI-versus-sham difference is unchanged across all three
 runs; the size of any change is reported.
 
-Hippocampus. A fixed margin > 1 rule was applied to BAM only (BAM cells
-below the threshold were reassigned to Unclassified). [TODO: this rule is not
-yet in the repository; add and verify before sharing.] The threshold is not
+Hippocampus. Earlier versions applied a fixed margin > 1 rule to BAM only.
+This was replaced (2026-10-06) by the same design as the Optic Tract: an
+unfiltered primary analysis plus two sensitivity runs, using the region's own
+pooled 15th-percentile margin (0.1745 with the 12-panel set; sens_neartie:
+BAM, Ependymal/ciliated, Microglia (Active)). A fixed threshold is not
 transferable across regions because the margin depends on the number of
 competing panels.
 
 ## Differential expression (TBI vs sham)
 
 Two methods per cell type, reported together: pseudobulk DESeq2 (mouse-level
-replication, n = 3 per group, candidate-panel restricted) as the conservative
-secondary analysis, and Seurat FindMarkers Wilcoxon on the full gene panel
-(cell-level replication) as the primary, more sensitive analysis. Cell-level
-tests treat cells as replicates, which carries a pseudoreplication risk; the
-pseudobulk analysis addresses it at lower power. Full details:
+replication, n = 3 per group) as the primary analysis, with a genome-wide
+pass and a pre-specified candidate-panel pass; and Seurat FindMarkers
+Wilcoxon on the full gene panel (cell-level replication) as a secondary,
+exploratory analysis. Cell-level tests treat cells as replicates, which
+inflates false positives (Squair et al., 2021); the pseudobulk analysis
+avoids this at lower power. Full details:
 protocols/differential_expression_protocol.md.
 
 Composition differences are tested per category with Welch's t-test and
@@ -85,10 +90,14 @@ unit (n = 3 per group).
 
 - Per-cell: atlas_identity, cell_type, classification_margin, runner_up.
 - Per-sample cell-count table (cell_counts_per_sample.csv, every run):
-  sample, n_cells, n_unclassified, pct_unclassified, group, region, run,
-  lasso_area_um2, cells_per_1000um2.
+  sample, n_cells, n_unclassified, pct_unclassified, pct_pass_qc20_10,
+  group, region, run, lasso_area_um2, cells_per_1000um2. pct_pass_qc20_10 is
+  the share of cells (already passing nCount >= 10 and nFeature >= 5) that
+  would also pass a stricter nCount >= 20 and nFeature >= 10 cutoff.
 - Composition tables and bar charts, UMAP, spatial maps and DE heatmaps in
   outputs/.
+- Folders ending in _withCP hold the earlier 13-panel hippocampus runs
+  (before Choroid plexus was excluded), kept for comparison.
 
 ## Known limitations
 
@@ -112,59 +121,42 @@ unit (n = 3 per group).
   Precursor oligodendrocyte, Endothelial) were unchanged between runs.
   (Pericyte/vascular SMC changed sign in the all-category run by 0.2
   percentage points, which is negligible.)
+- Sensitivity to near-tie handling (Hippocampus, 12 panels; see
+  outputs/hippocampus_near_tie_sensitivity.csv): Ependymal/ciliated and
+  Fibroblast/meningeal changed sign, and the Pericyte/vascular SMC
+  difference fell to about zero in the all-category run. BAM kept its sign,
+  but its difference fell from 1.29 to 0.08 percentage points, so the
+  unfiltered BAM difference is attributed to near-tie calls. Hippocampal
+  pyramidal, Dentate gyrus granule, Homeostatic astrocyte and Mature
+  oligodendrocyte were stable across all three runs.
+- Hippocampal Ependymal/ciliated calls are mixed: mostly Foxj1-driven, with
+  some calls lining the ventricular edge of the lasso. The category is kept
+  and reported as not robust.
 - Marker spillover from neighbouring cells (segmentation) can contribute to
   signal for some genes.
+- Sample quality: in the hippocampus, median transcripts per cell were
+  comparable between groups (TBI 613-639, sham 597-726), so composition
+  differences there are unlikely to reflect sample quality.
 
 ## Open items
 
-- Add the hippocampus BAM margin rule to the repository and verify that it
-  reproduces the reported BAM percentages.
-- Check Neutrophil (Csf3r) and Choroid plexus for single-gene drivers, as was
-  done for the panels excluded from the optic tract.
-- Re-derive the hippocampus confidence threshold on the same percentile basis
-  as the optic tract.
+- Optic Tract: check Neutrophil (Csf3r) and Choroid plexus for single-gene
+  drivers, as was done for hippocampal Choroid plexus (R/check_driver_genes.R).
+- Optic Tract: compare per-sample transcript depth between groups.
+- UMAP coloured by sample, to check whether any island comes from a single
+  mouse.
+- gi_2_d BAM: 0 cells under the detection floor in an earlier run, 264 in
+  the current run; confirm which cells the 0.5% floor is calculated on.
+- Robustness to the percentile choice (10th and 25th, alongside the 15th).
+- Update the DE results summary in protocols/differential_expression_protocol.md
+  from the 12-panel runs, and save DE result tables to outputs/.
+- R/build_stats_table.R: replace the deprecated cur_data() with
+  pick(everything()).
+- Sources for the optic-tract immune panels.
 - Exploratory astrocyte-only state analysis using a pre-specified,
   literature-derived gene set (sample as unit).
 
-## Repository structure
-
-- R/run_full_pipeline.R: run_region_pipeline(), the full pipeline end to end
-  (classification, composition, UMAP, both DE analyses), called once per
-  region. Edit the CONFIG/RUN sections (data paths) before running; run
-  section by section the first time. Per-sample checkpoints
-  (*_classified_prefilter.rds) are gitignored.
-- R/marker_panels.R: marker panel definitions and region-specific candidate sets
-- R/classify_atlas_index.R: per-cell classification
-- R/process_sample_template.R: per-sample load, QC, normalize, lasso, classify
-- R/apply_confidence_filter.R: margin filter (fixed and pooled-percentile versions)
-- R/build_cell_count_table.R: per-sample cell-count table
-- R/build_composition_summary.R: composition percentages and group summaries
-- R/build_stats_table.R: Welch t-test with Benjamini-Hochberg correction
-- R/check_marker_spillover.R: marker spillover diagnostic
-- R/plot_composition_barchart.R, R/plot_umap_celltype.R,
-  R/plot_spatial_celltype.R, R/plot_de_heatmap.R: figures
-- R/de_candidate_panels.R, R/run_pseudobulk_de.R, R/run_wilcox_de.R: DE analyses
-- protocols/: written classification and differential expression protocols
-- outputs/: generated figures and tables
-
-## Data
-
-Raw Xenium output and lasso CSV files are not tracked in this repository
-(unpublished research data; see .gitignore). They are stored on the lab's
-external drive.
-- Sensitivity to near-tie handling (Optic Tract; see
-  outputs/optic_tract_near_tie_sensitivity.csv): the TBI-minus-sham difference
-  in composition changed sign when near-tie cells were reassigned to
-  Unclassified for Unclassified, Neutrophil, B cell, Choroid plexus and
-  Peripheral macrophage (shifts of 2.5 to 6.7 percentage points). Group
-  differences in these five categories are not robust and are not
-  interpreted. All other categories kept their direction, and the largest
-  (Mature oligodendrocyte, Homeostatic microglia, Homeostatic astrocyte,
-  Precursor oligodendrocyte, Endothelial) were unchanged between runs.
-  (Pericyte/vascular SMC changed sign in the all-category run by 0.2
-  percentage points, which is negligible.)
-  
-  ## Planned analysis: mixed-model differential expression (FLASH-MM)
+## Planned analysis: mixed-model differential expression (FLASH-MM)
 
 **Status:** proposed, not yet implemented. For biostatistician review.
 
@@ -185,4 +177,36 @@ within-mouse correlation.
 **Questions for review:** model specification (fixed and random effects,
 covariates such as library size), normalisation, and whether to report
 it alongside or instead of the Wilcoxon results.
-  
+
+## Repository structure
+
+- R/run_full_pipeline.R: setup only (packages, functions, marker panels,
+  sample paths and lassos). Safe to source():
+  source("R/run_full_pipeline.R"). Defines run_region_pipeline(), the full
+  pipeline end to end (classification, composition, UMAP, both DE analyses).
+- R/run_analyses.R: the exact runs behind the reported results (primary and
+  both sensitivity runs per region, robustness and stats tables, driver-gene
+  diagnostics). Run one block at a time; each run is heavy. Per-sample
+  checkpoints (*_classified_prefilter.rds) are gitignored.
+- R/marker_panels.R: marker panel definitions and region-specific candidate sets
+- R/classify_atlas_index.R: per-cell classification
+- R/process_sample_template.R: per-sample load, QC, normalize, lasso, classify
+- R/apply_confidence_filter.R: margin filter (fixed and pooled-percentile versions)
+- R/build_cell_count_table.R: per-sample cell-count table
+- R/build_composition_summary.R: composition percentages and group summaries
+- R/build_stats_table.R: Welch t-test with Benjamini-Hochberg correction
+- R/check_marker_spillover.R: marker spillover diagnostic
+- R/check_driver_genes.R: single-gene driver diagnostics (per-gene detection,
+  runner-up labels, spatial location of a category's cells)
+- R/plot_lasso_overview.R: lasso outlines over each sample's cells
+- R/plot_composition_barchart.R, R/plot_umap_celltype.R,
+  R/plot_spatial_celltype.R, R/plot_de_heatmap.R: figures
+- R/de_candidate_panels.R, R/run_pseudobulk_de.R, R/run_wilcox_de.R: DE analyses
+- protocols/: written classification and differential expression protocols
+- outputs/: generated figures and tables
+
+## Data
+
+Raw Xenium output and lasso CSV files are not tracked in this repository
+(unpublished research data; see .gitignore). They are stored on the lab's
+external drive.

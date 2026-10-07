@@ -52,7 +52,7 @@ hippocampus_sens_neartie <- run_region_pipeline(
   run_label = "sens_neartie",
   prefilter_objects = hippocampus_results$sample_objects_prefilter)
 
-# ---- Optic tract (16 panels; Sakthi's new lassos) ----
+# ---- Optic tract (16 panels; redrawn lassos, 2026-10-05) ----
 
 optic_tract_results <- run_region_pipeline(
   sample_base, optic_tract_lassos, "Optic Tract",

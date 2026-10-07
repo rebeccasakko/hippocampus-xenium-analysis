@@ -8,13 +8,12 @@ replacement for the other.
 
 ## Why two methods
 
-Sakthi asked to see the Seurat `FindMarkers` Wilcoxon method used in a
-paper he shared. That method is run here as the **primary** analysis,
-alongside the pseudobulk DESeq2 approach already in use as the
-**secondary** analysis. They differ on exactly one axis that matters a
+The Seurat `FindMarkers` Wilcoxon method follows Qiu et al. (2022, *Front. Neurosci.*).
+Pseudobulk DESeq2 is the **primary** analysis and the Wilcoxon method the
+**secondary** (exploratory) analysis. They differ on exactly one axis that matters a
 great deal at n = 3 mice per group: the unit of biological replication.
 
-## Method 1 (secondary): Pseudobulk DESeq2 -- `R/run_pseudobulk_de.R`
+## Method 1 (primary): Pseudobulk DESeq2 -- `R/run_pseudobulk_de.R`
 
 All cells of one cell type, from one mouse, are aggregated into a single
 expression profile before testing (`Seurat::AggregateExpression()`). The
@@ -39,7 +38,7 @@ effect" claim.
 undetected (type II error), which is likely part of why the genome-wide
 pass came back null everywhere.
 
-## Method 2 (primary): Seurat FindMarkers, Wilcoxon, full gene panel -- `R/run_wilcox_de.R`
+## Method 2 (secondary, exploratory): Seurat FindMarkers, Wilcoxon, full gene panel -- `R/run_wilcox_de.R`
 
 Every individual cell is treated as an independent observation -- no
 aggregation, no candidate-list restriction, run across every gene passing

@@ -4,11 +4,10 @@
 # ("spillover") bled in from a neighboring cell type that
 # strongly expresses that marker?
 #
-# Written up (2026-10-02) from the Gfap-in-Microglia investigation
-# done interactively in console with Sakthi's question in mind --
-# "pull raw Gfap counts in the microglia panel: real signal or
-# spillover?" -- so the same four-part diagnostic can be re-run on
-# a different gene/cell-type pair later rather than redone by hand.
+# Written up (2026-10-02) from an interactive investigation of Gfap
+# signal in the microglia panel ("real signal or spillover?"), so the
+# same four-part diagnostic can be re-run on a different gene/cell-type
+# pair later rather than redone by hand.
 #
 # Logic: if marker-positive cells in the target population are
 # actually segmentation-blended with the contaminating cell type,
