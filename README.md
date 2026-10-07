@@ -164,3 +164,25 @@ external drive.
   (Pericyte/vascular SMC changed sign in the all-category run by 0.2
   percentage points, which is negligible.)
   
+  ## Planned analysis: mixed-model differential expression (FLASH-MM)
+
+**Status:** proposed, not yet implemented. For biostatistician review.
+
+Current DE runs within every pipeline run, for astrocytes, microglia,
+dentate gyrus granule cells and GABAergic interneurons (TBI vs sham):
+
+- **Pseudobulk** (primary): counts summed per mouse, so the mouse is the
+  unit of analysis (n = 3 vs 3). Statistically appropriate but low-powered.
+- **Wilcoxon** (exploratory): cell-level test that treats cells as
+  independent, which inflates significance because cells from the same
+  mouse are correlated.
+
+**Proposed:** a cell-level linear mixed model with mouse as a random
+effect (e.g. FLASH-MM), for the same cell types and comparison, with BH
+correction. This keeps cell-level resolution while accounting for
+within-mouse correlation.
+
+**Questions for review:** model specification (fixed and random effects,
+covariates such as library size), normalisation, and whether to report
+it alongside or instead of the Wilcoxon results.
+  
