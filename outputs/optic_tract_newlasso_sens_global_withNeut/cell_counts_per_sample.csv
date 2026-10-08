@@ -1,0 +1,7 @@
+"sample","n_cells","n_unclassified","pct_unclassified","group","region","run","lasso_area_um2","cells_per_1000um2"
+"gi_1_b",609,87,14.3,"gi","Optic Tract","sens_global",133292.56088871,4.57
+"gi_2_d",763,139,18.2,"gi","Optic Tract","sens_global",227043.934463409,3.36
+"gi_3_f",866,183,21.1,"gi","Optic Tract","sens_global",206175.893775164,4.2
+"gii_1_a",494,122,24.7,"gii","Optic Tract","sens_global",142932.964037017,3.46
+"gii_2_c",310,46,14.8,"gii","Optic Tract","sens_global",75567.8379397914,4.1
+"gii_3_e",156,31,19.9,"gii","Optic Tract","sens_global",48799.7440668924,3.2

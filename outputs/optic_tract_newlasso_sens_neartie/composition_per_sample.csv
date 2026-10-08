@@ -1,0 +1,109 @@
+"sample_id","group_id","cell_type","n_cells","total_cells","pct","replicate_num"
+"gi_1_b","gi","GABAergic interneuron",24,609,3.94088669950739,1
+"gi_1_b","gi","Oligodendrocyte (Mature)",131,609,21.5106732348112,1
+"gi_1_b","gi","Endothelial",37,609,6.07553366174056,1
+"gi_1_b","gi","Fibroblast/meningeal",27,609,4.43349753694581,1
+"gi_1_b","gi","Pericyte/vascular SMC",23,609,3.77668308702791,1
+"gi_1_b","gi","Unclassified",82,609,13.4646962233169,1
+"gi_1_b","gi","Astrocyte (Active)",53,609,8.70279146141215,1
+"gi_1_b","gi","Microglia (Homeostatic)",40,609,6.56814449917898,1
+"gi_1_b","gi","Choroid plexus",23,609,3.77668308702791,1
+"gi_1_b","gi","Dendritic cell",34,609,5.58292282430213,1
+"gi_1_b","gi","Oligodendrocyte (Precursor)",27,609,4.43349753694581,1
+"gi_1_b","gi","BAM",20,609,3.28407224958949,1
+"gi_1_b","gi","Peripheral macrophage",40,609,6.56814449917898,1
+"gi_1_b","gi","Astrocyte (Homeostatic)",3,609,0.492610837438424,1
+"gi_1_b","gi","B cell",32,609,5.25451559934319,1
+"gi_1_b","gi","Microglia (Active)",13,609,2.13464696223317,1
+"gi_1_b","gi","T cell",0,609,0,1
+"gi_1_b","gi","NK cell",0,609,0,1
+"gi_2_d","gi","GABAergic interneuron",37,763,4.84927916120577,2
+"gi_2_d","gi","Oligodendrocyte (Mature)",184,763,24.1153342070773,2
+"gi_2_d","gi","Endothelial",42,763,5.5045871559633,2
+"gi_2_d","gi","Fibroblast/meningeal",37,763,4.84927916120577,2
+"gi_2_d","gi","Pericyte/vascular SMC",22,763,2.88335517693316,2
+"gi_2_d","gi","Unclassified",140,763,18.348623853211,2
+"gi_2_d","gi","Astrocyte (Active)",46,763,6.02883355176933,2
+"gi_2_d","gi","Microglia (Homeostatic)",70,763,9.1743119266055,2
+"gi_2_d","gi","Choroid plexus",21,763,2.75229357798165,2
+"gi_2_d","gi","Dendritic cell",29,763,3.80078636959371,2
+"gi_2_d","gi","Oligodendrocyte (Precursor)",24,763,3.14547837483617,2
+"gi_2_d","gi","BAM",35,763,4.58715596330275,2
+"gi_2_d","gi","Peripheral macrophage",38,763,4.98034076015727,2
+"gi_2_d","gi","Astrocyte (Homeostatic)",7,763,0.91743119266055,2
+"gi_2_d","gi","B cell",16,763,2.09698558322412,2
+"gi_2_d","gi","Microglia (Active)",15,763,1.96592398427261,2
+"gi_2_d","gi","T cell",0,763,0,2
+"gi_2_d","gi","NK cell",0,763,0,2
+"gi_3_f","gi","GABAergic interneuron",28,866,3.23325635103926,3
+"gi_3_f","gi","Oligodendrocyte (Mature)",190,866,21.9399538106236,3
+"gi_3_f","gi","Endothelial",45,866,5.19630484988453,3
+"gi_3_f","gi","Fibroblast/meningeal",29,866,3.34872979214781,3
+"gi_3_f","gi","Pericyte/vascular SMC",30,866,3.46420323325635,3
+"gi_3_f","gi","Unclassified",175,866,20.2078521939954,3
+"gi_3_f","gi","Astrocyte (Active)",93,866,10.7390300230947,3
+"gi_3_f","gi","Microglia (Homeostatic)",77,866,8.89145496535797,3
+"gi_3_f","gi","Choroid plexus",26,866,3.00230946882217,3
+"gi_3_f","gi","Dendritic cell",38,866,4.38799076212471,3
+"gi_3_f","gi","Oligodendrocyte (Precursor)",38,866,4.38799076212471,3
+"gi_3_f","gi","BAM",0,866,0,3
+"gi_3_f","gi","Peripheral macrophage",41,866,4.73441108545035,3
+"gi_3_f","gi","Astrocyte (Homeostatic)",17,866,1.96304849884527,3
+"gi_3_f","gi","B cell",16,866,1.84757505773672,3
+"gi_3_f","gi","Microglia (Active)",23,866,2.65588914549654,3
+"gi_3_f","gi","T cell",0,866,0,3
+"gi_3_f","gi","NK cell",0,866,0,3
+"gii_1_a","gii","GABAergic interneuron",9,494,1.82186234817814,1
+"gii_1_a","gii","Oligodendrocyte (Mature)",121,494,24.4939271255061,1
+"gii_1_a","gii","Endothelial",25,494,5.06072874493927,1
+"gii_1_a","gii","Fibroblast/meningeal",17,494,3.4412955465587,1
+"gii_1_a","gii","Pericyte/vascular SMC",18,494,3.64372469635628,1
+"gii_1_a","gii","Unclassified",100,494,20.2429149797571,1
+"gii_1_a","gii","Astrocyte (Active)",35,494,7.08502024291498,1
+"gii_1_a","gii","Microglia (Homeostatic)",47,494,9.51417004048583,1
+"gii_1_a","gii","Choroid plexus",12,494,2.42914979757085,1
+"gii_1_a","gii","Dendritic cell",40,494,8.09716599190283,1
+"gii_1_a","gii","Oligodendrocyte (Precursor)",18,494,3.64372469635628,1
+"gii_1_a","gii","BAM",5,494,1.01214574898785,1
+"gii_1_a","gii","Peripheral macrophage",13,494,2.63157894736842,1
+"gii_1_a","gii","Astrocyte (Homeostatic)",13,494,2.63157894736842,1
+"gii_1_a","gii","B cell",0,494,0,1
+"gii_1_a","gii","Microglia (Active)",21,494,4.25101214574899,1
+"gii_1_a","gii","T cell",0,494,0,1
+"gii_1_a","gii","NK cell",0,494,0,1
+"gii_2_c","gii","GABAergic interneuron",8,310,2.58064516129032,2
+"gii_2_c","gii","Oligodendrocyte (Mature)",68,310,21.9354838709677,2
+"gii_2_c","gii","Endothelial",26,310,8.38709677419355,2
+"gii_2_c","gii","Fibroblast/meningeal",14,310,4.51612903225806,2
+"gii_2_c","gii","Pericyte/vascular SMC",19,310,6.12903225806452,2
+"gii_2_c","gii","Unclassified",44,310,14.1935483870968,2
+"gii_2_c","gii","Astrocyte (Active)",30,310,9.67741935483871,2
+"gii_2_c","gii","Microglia (Homeostatic)",29,310,9.35483870967742,2
+"gii_2_c","gii","Choroid plexus",19,310,6.12903225806452,2
+"gii_2_c","gii","Dendritic cell",6,310,1.93548387096774,2
+"gii_2_c","gii","Oligodendrocyte (Precursor)",10,310,3.2258064516129,2
+"gii_2_c","gii","BAM",9,310,2.90322580645161,2
+"gii_2_c","gii","Peripheral macrophage",6,310,1.93548387096774,2
+"gii_2_c","gii","Astrocyte (Homeostatic)",9,310,2.90322580645161,2
+"gii_2_c","gii","B cell",0,310,0,2
+"gii_2_c","gii","Microglia (Active)",10,310,3.2258064516129,2
+"gii_2_c","gii","T cell",3,310,0.967741935483871,2
+"gii_2_c","gii","NK cell",0,310,0,2
+"gii_3_e","gii","GABAergic interneuron",8,156,5.12820512820513,3
+"gii_3_e","gii","Oligodendrocyte (Mature)",43,156,27.5641025641026,3
+"gii_3_e","gii","Endothelial",11,156,7.05128205128205,3
+"gii_3_e","gii","Fibroblast/meningeal",9,156,5.76923076923077,3
+"gii_3_e","gii","Pericyte/vascular SMC",5,156,3.2051282051282,3
+"gii_3_e","gii","Unclassified",28,156,17.948717948718,3
+"gii_3_e","gii","Astrocyte (Active)",11,156,7.05128205128205,3
+"gii_3_e","gii","Microglia (Homeostatic)",17,156,10.8974358974359,3
+"gii_3_e","gii","Choroid plexus",4,156,2.56410256410256,3
+"gii_3_e","gii","Dendritic cell",1,156,0.641025641025641,3
+"gii_3_e","gii","Oligodendrocyte (Precursor)",2,156,1.28205128205128,3
+"gii_3_e","gii","BAM",7,156,4.48717948717949,3
+"gii_3_e","gii","Peripheral macrophage",4,156,2.56410256410256,3
+"gii_3_e","gii","Astrocyte (Homeostatic)",2,156,1.28205128205128,3
+"gii_3_e","gii","B cell",1,156,0.641025641025641,3
+"gii_3_e","gii","Microglia (Active)",2,156,1.28205128205128,3
+"gii_3_e","gii","T cell",0,156,0,3
+"gii_3_e","gii","NK cell",1,156,0.641025641025641,3
