@@ -4,8 +4,8 @@
 
 Written last (Phase 9). Until then: this is the plain-language guide to running and maintaining
 the pipeline; the science review (`docs/review/science-review.md`) says what it does and why; the
-findings log (`docs/review/issueN-audit-log.md`, name finalised when the issue exists) is the audit
-record and holds every decision. Line numbers refer to commit 869af28. Last updated 7 Oct 2026
+findings log (`docs/review/issue6-audit-repo-log.md`) is the audit record and holds every
+decision. Line numbers refer to commit 869af28. Last updated 7 Oct 2026
 (Phase 2 draft: §1 and §2 only).
 
 ## 1. The pipeline in one page

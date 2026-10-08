@@ -8,7 +8,7 @@ Original author: rebeccasakko (research assistant, Abisambra Lab, University of 
 Reviewers: Holden Harris (holden-harris), with Claude Code. Date: 7 Oct 2026.
 Status: DRAFT (Phase 2 orientation), for the author's review. Not yet agreed with the author.
 How to cite: "Science review of hippocampus-xenium-analysis, draft of 7 Oct 2026, docs/review/science-review.md".
-Version history: 2026-10-07 first draft (audit issue, number pending).
+Version history: 2026-10-07 first draft (issue #6).
 ```
 
 Every statement below cites where it comes from: a file and line against commit 869af28, a README

@@ -53,3 +53,8 @@ rsconnect/
 # Allow summary tables in outputs/
 !outputs/*.csv
 !outputs/**/*.csv
+
+# Audit conventions (code-audit skill): local overrides, author scratch, Rscript plot fallout
+config.local.R
+hoard/
+Rplots.pdf
