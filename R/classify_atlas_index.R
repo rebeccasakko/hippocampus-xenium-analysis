@@ -2,22 +2,37 @@ classify_atlas_index <-
 function(xenium, marker_list = atlas_index_markers, min_z = 0, min_detect_rate = 0.005) {
     label_lookup <- setNames(names(marker_list), paste0("idx_", make.names(names(marker_list))))
     score_cols <- character(0)
+    # Per-panel record of what happened in this sample (audit finding B6): the
+    # warnings below are deferred and truncated in a six-sample run, and the
+    # per-sample on/off decision of the detection floor changes composition.
+    # Stored in xenium@misc$panel_status; run_region_pipeline() writes it out.
+    panel_status <- data.frame(panel = names(marker_list), status = NA_character_,
+                               n_genes_in_panel = lengths(marker_list), n_genes_present = NA_integer_,
+                               best_gene = NA_character_, best_detect_rate = NA_real_,
+                               stringsAsFactors = FALSE)
     counts <- GetAssayData(xenium, layer = "counts")
     for (name in names(marker_list)) {
+        k <- match(name, panel_status$panel)
         genes <- intersect(marker_list[[name]], rownames(xenium))
+        panel_status$n_genes_present[k] <- length(genes)
         if (length(genes) == 0) {
+            panel_status$status[k] <- "no_gene_on_panel"
             warning("No genes from '", name, "' panel found in this object's gene panel -- skipping")
             next
         }
         detect_rate <- Matrix::rowMeans(counts[genes, , drop = FALSE] > 0)
         best_rate <- max(detect_rate)
+        panel_status$best_gene[k] <- names(which.max(detect_rate))
+        panel_status$best_detect_rate[k] <- unname(best_rate)
         if (best_rate < min_detect_rate) {
+            panel_status$status[k] <- "below_detection_floor"
             warning("'", name, "' panel's best single marker (", names(which.max(detect_rate)),
                     ") is detected in only ", round(100 * best_rate, 3), "% of cells -- below the ",
                     100 * min_detect_rate, "% reliability floor -- excluded from scoring ",
                     "(a module score built on this sparse a signal is dominated by noise and can win the argmax spuriously)")
             next
         }
+        panel_status$status[k] <- "scored"
         detected <- genes[Matrix::rowSums(counts[genes, , drop = FALSE]) > 0]
         score_name <- paste0("idx_", make.names(name))
         xenium <- AddModuleScore(xenium, features = list(detected), name = score_name)
@@ -61,6 +76,11 @@ function(xenium, marker_list = atlas_index_markers, min_z = 0, min_detect_rate =
         xenium$cell_type[colnames(xenium) %in% oligo_cells] <- paste0("Oligodendrocyte (",
                                                                       refine_state(oligo_cells, oligo_mature_markers, "Mature", oligo_precursor_markers, "Precursor"), ")")
     }
+    called <- table(xenium$atlas_identity)
+    panel_status$n_cells_called <- as.integer(ifelse(is.na(match(panel_status$panel, names(called))), 0L,
+                                                     called[match(panel_status$panel, names(called))]))
+    panel_status$min_detect_rate <- min_detect_rate
+    xenium@misc[["panel_status"]] <- panel_status
     cat("\n==== cell_type counts ====\n"); print(table(xenium$cell_type))
     if ("idx_Purkinje..sanity.check." %in% score_cols) {
         purkinje_pct <- 100 * mean(xenium$atlas_identity == "Purkinje (sanity check)")

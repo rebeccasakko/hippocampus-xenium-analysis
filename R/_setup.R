@@ -99,3 +99,25 @@ fn.check_inputs <- function(manifest, stop.on.missing = TRUE) {
   }
   invisible(m)
 }
+
+# Provenance ------------------------------------------------------------------------------
+#' The commit the working tree is at, read from .git without calling git (base R only), so
+#' run_info.txt can record which code produced a run. NA when it cannot be read.
+#' @param repo Path of the repository root.
+#' @return A 40-character SHA, or NA_character_.
+fn.git_head <- function(repo = ".") {
+  tryCatch({
+    head <- readLines(file.path(repo, ".git", "HEAD"), warn = FALSE)[1]
+    if (!startsWith(head, "ref: ")) return(head)
+    ref <- sub("^ref: ", "", head)
+    loose <- file.path(repo, ".git", ref)
+    if (file.exists(loose)) return(readLines(loose, warn = FALSE)[1])
+    packed <- file.path(repo, ".git", "packed-refs")
+    if (file.exists(packed)) {
+      lines <- readLines(packed, warn = FALSE)
+      hit <- lines[endsWith(lines, paste0(" ", ref))]
+      if (length(hit) > 0) return(substr(hit[1], 1, 40))
+    }
+    NA_character_
+  }, error = function(e) NA_character_)
+}

@@ -123,9 +123,15 @@ run_region_pipeline <- function(sample_base, lasso_map, region_label, de_cell_ty
                                 confidence_percentile = NULL,
                                 confidence_categories = NULL,
                                 run_label = "primary",
-                                prefilter_objects = NULL) {
-  
+                                prefilter_objects = NULL,
+                                skip_embedding_and_de = FALSE) {
+  # skip_embedding_and_de: TRUE skips stages 4 (UMAP) and 5 (DE). The confidence
+  # filter only rewrites cell_type while DE selects on atlas_identity, so a
+  # sensitivity run's DE is identical to its primary run's (audit finding M2);
+  # the default FALSE keeps the original behaviour and outputs.
+
   dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
+  stage_times <- list(start = Sys.time())   # written to run_info.txt at the end (audit T1)
   
   sample_config <- sample_base %>%
     mutate(lasso_csv = unname(lasso_map[sample_id]))
@@ -150,13 +156,33 @@ run_region_pipeline <- function(sample_base, lasso_map, region_label, de_cell_ty
   }
   
   # ---- Stage 1: per-sample load -> QC -> normalize -> lasso-restrict -> classify ----
+  # What a checkpoint was made with, so a rerun into the same folder after a
+  # panel or lasso change does not silently load a stale classification
+  # (audit finding R7). Stored beside the .rds as <ckpt>.meta.txt.
+  ckpt_meta <- function(lasso_csv) {
+    c(paste0("region=", region_label),
+      paste0("panels=", paste(names(marker_list), collapse = ";")),
+      paste0("lasso_md5=", unname(tools::md5sum(lasso_csv))),
+      "qc=nCount_Xenium>=10;nFeature_Xenium>=5")
+  }
   if (is.null(prefilter_objects)) {
     sample_objects <- lapply(seq_len(nrow(sample_config)), function(i) {
       row <- sample_config[i, ]
       ckpt <- file.path(output_dir, paste0(row$sample_id, "_classified_prefilter.rds"))
+      meta_file <- paste0(ckpt, ".meta.txt")
+      expected  <- ckpt_meta(row$lasso_csv)
       if (file.exists(ckpt)) {
-        message("\n==== ", region_label, ": loading saved ", row$sample_id, " ====")
-        return(readRDS(ckpt))
+        if (!file.exists(meta_file)) {
+          message("\n==== ", region_label, ": loading saved ", row$sample_id,
+                  " (checkpoint made before the sidecar existed; panels and lasso not verifiable) ====")
+          return(readRDS(ckpt))
+        } else if (identical(readLines(meta_file, warn = FALSE), expected)) {
+          message("\n==== ", region_label, ": loading saved ", row$sample_id, " ====")
+          return(readRDS(ckpt))
+        } else {
+          warning(sprintf("Checkpoint %s was made with a different region, panel set, lasso file or QC (see %s); recomputing it",
+                          basename(ckpt), basename(meta_file)), call. = FALSE)
+        }
       }
       message("\n==== ", region_label, ": processing ", row$sample_id, " ====")
       obj <- process_hippocampus_sample(
@@ -168,6 +194,7 @@ run_region_pipeline <- function(sample_base, lasso_map, region_label, de_cell_ty
         marker_list = marker_list
       )
       saveRDS(obj, ckpt)   # gitignored (*.rds) -- lets an interrupted run resume
+      writeLines(expected, meta_file)
       gc()
       obj
     })
@@ -180,20 +207,46 @@ run_region_pipeline <- function(sample_base, lasso_map, region_label, de_cell_ty
     sample_objects <- prefilter_objects
   }
   sample_objects_prefilter <- sample_objects
+  stage_times$stage1_classified <- Sys.time()
+
+  # Which panels were scored in which mouse (the 0.5% detection floor is per
+  # sample), recorded by classify_atlas_index() in obj@misc$panel_status
+  # (audit finding B6). Checkpoints made before that exist carry no table.
+  panel_status <- do.call(rbind, lapply(names(sample_objects), function(s) {
+    ps <- sample_objects[[s]]@misc[["panel_status"]]
+    if (is.null(ps)) NULL else cbind(sample = s, ps, stringsAsFactors = FALSE)
+  }))
+  if (is.null(panel_status)) {
+    message("panel_status_per_sample.csv not written: the loaded objects predate the panel-status record.")
+  } else {
+    write.csv(panel_status, file.path(output_dir, "panel_status_per_sample.csv"), row.names = FALSE)
+  }
+
+  # Per-sample depth of the ROI cells that passed QC (audit finding R3; the
+  # previously committed hippocampus_per_sample_depth.csv had no producing code).
+  depth <- data.frame(
+    sample = names(sample_objects),
+    group  = vapply(sample_objects, function(o) ifelse(as.character(unique(o$group_id))[1] == "gi", "TBI", "sham"), character(1)),
+    median_transcripts = vapply(sample_objects, function(o) as.numeric(median(o$nCount_Xenium)), numeric(1)),
+    median_genes       = vapply(sample_objects, function(o) as.numeric(median(o$nFeature_Xenium)), numeric(1)),
+    row.names = NULL)
+  write.csv(depth, file.path(output_dir, "per_sample_depth.csv"), row.names = FALSE)
   
   # ---- Stage 1b: confidence-margin filter (optional, region-derived) ----
-  # Only applied when confidence_percentile is supplied -- hippocampus
-  # is called without it and stays on its existing BAM-specific fix.
-  # See R/apply_confidence_filter.R for the rationale on deriving the
-  # threshold from this region's own pooled margin distribution rather
-  # than reusing a fixed number across regions.
-  # confidence_categories limits WHICH cell types can be reclassified
-  # (primary run: only types with a diagnosed near-tie problem, e.g. BAM);
-  # NULL applies the filter to every cell (global sensitivity run).
+  # Only applied when confidence_percentile is supplied: the primary run of
+  # each region passes nothing and stays unfiltered; the two sensitivity
+  # runs pass 0.15 (see R/run_analyses.R). See R/apply_confidence_filter.R
+  # for the rationale on deriving the threshold from this region's own
+  # pooled margin distribution rather than reusing a fixed number across
+  # regions. confidence_categories limits WHICH cell types can be
+  # reclassified (sens_neartie: the categories with a diagnosed near-tie
+  # problem); NULL applies the filter to every cell (sens_global).
+  confidence_threshold <- NA_real_
   if (!is.null(confidence_percentile)) {
     sample_objects <- apply_confidence_filter_pooled(
       sample_objects, percentile = confidence_percentile,
       categories = confidence_categories)
+    confidence_threshold <- attr(sample_objects, "threshold")
   }
   
   # ---- Stage 1c: cells-per-sample table (standard output of every run) ----
@@ -221,47 +274,111 @@ run_region_pipeline <- function(sample_base, lasso_map, region_label, de_cell_ty
   if (interactive()) print(composition_plot)
   ggsave(file.path(output_dir, "composition_barchart.png"), composition_plot,
          width = 9, height = 6, dpi = 200, bg = "white")
-  
+  # The per-sample table behind the chart (audit finding R1; previously written
+  # by hand). Same columns as the committed composition_per_sample.csv files.
+  write.csv(composition$composition_df, file.path(output_dir, "composition_per_sample.csv"),
+            row.names = FALSE)
+  stage_times$stage3_composition <- Sys.time()
+
+  de_results <- list()
+  sig_counts <- integer(0)
+  if (isTRUE(skip_embedding_and_de)) {
+    message("\nskip_embedding_and_de = TRUE: stages 4 (UMAP) and 5 (DE) skipped for this run.")
+  } else {
   # ---- Stage 4: UMAP + microglia state QC check ----
   combined <- FindVariableFeatures(combined)
   combined <- ScaleData(combined)
   combined <- RunPCA(combined, npcs = 30)
   combined <- RunUMAP(combined, dims = 1:30)
-  
+
   umap_celltype <- plot_umap_celltype(combined)
   if (interactive()) print(umap_celltype)
   ggsave(file.path(output_dir, "umap_celltype_gi_vs_gii.png"), umap_celltype,
          width = 10, height = 6, dpi = 200, bg = "white")
-  
+
   umap_microglia_check <- plot_umap_microglia_check(combined)
   if (interactive()) print(umap_microglia_check)
   ggsave(file.path(output_dir, "umap_microglia_check_gi_vs_gii.png"), umap_microglia_check,
          width = 10, height = 6, dpi = 200, bg = "white")
-  
+  stage_times$stage4_umap <- Sys.time()
+
   # ---- Stage 5: differential expression, both methods, per this region's cell types ----
-  de_results <- list()
+  # Result tables and DESeq2 diagnostics go to <output_dir>/de/ (audit findings
+  # R2 and M8; the tables were previously written by hand). Diagnostics are
+  # wrapped so a plotting problem never stops a run.
+  de_dir <- file.path(output_dir, "de")
+  dir.create(de_dir, showWarnings = FALSE, recursive = TRUE)
   for (key in names(de_cell_types)) {
     label <- de_cell_types[[key]]$label
     message("\n==== ", region_label, " differential expression: ", label, " ====")
-    
+
     dds       <- build_pseudobulk_dds(combined, label)
     res_full  <- get_pseudobulk_results(dds)
     res_panel <- run_pseudobulk_panel_de(res_full, de_cell_types[[key]]$candidates, dds)
     plot_panel_heatmap(dds, res_panel, label, file.path(output_dir, sprintf("pseudobulk_heatmap_%s.png", key)))
-    
+
     wilcox_res <- run_wilcox_degs(combined, label)
     plot_wilcox_heatmap(dds, wilcox_res, label, file.path(output_dir, sprintf("wilcox_heatmap_%s.png", key)))
-    
+
+    write.csv(res_full,   file.path(de_dir, paste0(key, "_res_full.csv")),   row.names = FALSE)
+    write.csv(res_panel,  file.path(de_dir, paste0(key, "_res_panel.csv")),  row.names = FALSE)
+    write.csv(wilcox_res, file.path(de_dir, paste0(key, "_wilcox_res.csv")), row.names = FALSE)
+    tryCatch({
+      png(file.path(de_dir, paste0(key, "_pvalue_hist.png")), width = 6, height = 4, units = "in", res = 150)
+      hist(res_full$pvalue, breaks = 40, main = paste0(label, ": pseudobulk DESeq2 p-values"),
+           xlab = "p-value (gi vs gii)", col = "grey80")
+      dev.off()
+      png(file.path(de_dir, paste0(key, "_dispersion.png")), width = 6, height = 5, units = "in", res = 150)
+      DESeq2::plotDispEsts(dds, main = paste0(label, ": DESeq2 dispersion estimates"))
+      dev.off()
+    }, error = function(e) {
+      try(dev.off(), silent = TRUE)
+      message("DESeq2 diagnostic plots not written for ", label, ": ", conditionMessage(e))
+    })
+
     de_results[[key]] <- list(dds = dds, res_full = res_full, res_panel = res_panel, wilcox_res = wilcox_res)
   }
-  
+
   sig_counts <- sapply(de_results, function(x) sum(x$wilcox_res$p_val_adj < 0.05))
   cat("\n==== ", region_label, ": Wilcoxon significant gene counts (padj < 0.05) ====\n")
   print(sig_counts)
-  
+  stage_times$stage5_de <- Sys.time()
+  }
+
+  # ---- Run record: what this run was, and the environment it ran in (audit R5, B4, T1) ----
+  stage_times$end <- Sys.time()
+  stage_names <- names(stage_times)
+  stage_lines <- vapply(seq_along(stage_times)[-1], function(k)
+    sprintf("time_%s=%s (%.1f min since %s)", stage_names[k],
+            format(stage_times[[k]], "%Y-%m-%d %H:%M:%S"),
+            as.numeric(difftime(stage_times[[k]], stage_times[[k - 1]], units = "mins")),
+            stage_names[k - 1]), character(1))
+  run_info <- c(
+    paste0("run_date=", format(stage_times$start, "%Y-%m-%d %H:%M:%S")),
+    paste0("region=", region_label),
+    paste0("run_label=", run_label),
+    paste0("output_dir=", output_dir),
+    paste0("git_commit=", fn.git_head(dir.repo)),
+    paste0("marker_panels=", paste(names(marker_list), collapse = ";")),
+    paste0("confidence_percentile=", if (is.null(confidence_percentile)) "none" else confidence_percentile),
+    paste0("confidence_categories=", if (is.null(confidence_categories)) "all" else paste(confidence_categories, collapse = ";")),
+    paste0("confidence_threshold=", confidence_threshold),
+    paste0("skip_embedding_and_de=", skip_embedding_and_de),
+    paste0("de_cell_types=", paste(vapply(de_cell_types, `[[`, character(1), "label"), collapse = ";")),
+    paste0("n_cells=", paste(sprintf("%s:%d", cell_counts$sample, cell_counts$n_cells), collapse = ";")),
+    paste0("stage1_source=", if (is.null(prefilter_objects)) "loaded or checkpoint" else "prefilter_objects supplied"),
+    paste0("total_minutes=", round(as.numeric(difftime(stage_times$end, stage_times$start, units = "mins")), 1)),
+    stage_lines,
+    paste0("R=", R.version.string),
+    paste0("Seurat=", as.character(utils::packageVersion("Seurat"))),
+    paste0("DESeq2=", as.character(utils::packageVersion("DESeq2"))))
+  writeLines(run_info, file.path(output_dir, "run_info.txt"))
+  writeLines(utils::capture.output(utils::sessionInfo()), file.path(output_dir, "session_info.txt"))
+
   list(sample_objects = sample_objects, sample_objects_prefilter = sample_objects_prefilter,
        combined = combined, composition = composition, cell_counts = cell_counts,
-       de_results = de_results, sig_counts = sig_counts)
+       de_results = de_results, sig_counts = sig_counts,
+       confidence_threshold = confidence_threshold, stage_times = stage_times)
 }
 
 # ============================================================

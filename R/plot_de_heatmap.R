@@ -54,11 +54,16 @@ plot_de_heatmap <- function(dds, genes, sig_lookup, cell_type_label, filename) {
                           rownames(z), paste0(rownames(z), " ", sig_lookup[rownames(z)]))
 
     sample_order <- colnames(z)
-    group_of     <- ifelse(grepl("^gi-", sample_order), "gi", "gii")  # NOTE: "^gi-" not "^gi" -- "gii" also starts with "gi"
+    # Group from the DESeqDataSet's own colData (set from group_id metadata in
+    # build_pseudobulk_dds(); audit finding B5), with the name-based rule as the
+    # fallback. NOTE for the fallback: "^gi-" not "^gi" -- "gii" also starts with "gi".
+    grp_all  <- setNames(as.character(dds$group), colnames(dds))
+    group_of <- unname(grp_all[sample_order])
+    if (anyNA(group_of)) group_of <- ifelse(grepl("^gi-", sample_order), "gi", "gii")
     ordered_samples <- c(sample_order[group_of == "gi"], sample_order[group_of == "gii"])
     z <- z[, ordered_samples, drop = FALSE]
 
-    group_anno <- data.frame(Group = ifelse(grepl("^gi-", ordered_samples), "gi", "gii"))
+    group_anno <- data.frame(Group = group_of[match(ordered_samples, sample_order)])
     rownames(group_anno) <- ordered_samples
     ann_colors <- list(Group = c(gi = "#5BC8C2", gii = "#F2A8A0"))
 

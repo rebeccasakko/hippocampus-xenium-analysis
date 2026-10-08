@@ -59,3 +59,4 @@ config.local.R
 hoard/
 Rplots.pdf
 data/
+*.rds.meta.txt

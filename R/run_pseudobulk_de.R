@@ -19,11 +19,22 @@ build_pseudobulk_dds <- function(xenium, cell_type_filter, identity_col = "atlas
     subset_obj <- subset(xenium, idents = cell_type_filter)
 
     pseudobulk <- AggregateExpression(subset_obj, group.by = "sample_id",
-                                      assays = "Xenium", slot = "counts")$Xenium
+                                      assays = "Xenium", layer = "counts")$Xenium   # layer=, not the deprecated slot= (audit B7)
 
+    # Group per aggregated column from the object's own sample_id -> group_id
+    # metadata (audit finding B5). AggregateExpression() turns "_" into "-" in
+    # column names (Seurat v5), so the match ignores non-alphanumerics; the old
+    # name-based rule remains as a fallback with a warning.
+    meta <- unique(subset_obj@meta.data[, c("sample_id", "group_id")])
+    key  <- function(x) gsub("[^A-Za-z0-9]", "", x)
+    grp  <- as.character(meta$group_id[match(key(colnames(pseudobulk)), key(meta$sample_id))])
+    if (anyNA(grp)) {
+        warning("Could not map every pseudobulk column to a group_id; falling back to the sample-name rule", call. = FALSE)
+        grp <- ifelse(grepl("^gi-", colnames(pseudobulk)), "gi", "gii")
+    }
     sample_meta <- data.frame(
         sample_id = colnames(pseudobulk),
-        group = ifelse(grepl("^gi-", colnames(pseudobulk)), "gi", "gii")
+        group = grp
     )
 
     dds <- DESeqDataSetFromMatrix(countData = round(as.matrix(pseudobulk)),

@@ -29,24 +29,33 @@ source("R/run_full_pipeline.R")   # setup only: functions, panels, lassos
 
 hippocampus_results <- run_region_pipeline(
   sample_base, hippocampus_lassos, "Hippocampus",
-  hippocampus_de_cell_types, "outputs/hippocampus_unfiltered",
+  hippocampus_de_cell_types, file.path(dir.out, "hippocampus_unfiltered"),
   marker_list = hippocampus_markers,
   run_label = "primary")
 
 hippocampus_sens_global <- run_region_pipeline(
   sample_base, hippocampus_lassos, "Hippocampus",
-  hippocampus_de_cell_types, "outputs/hippocampus_sens_global",
+  hippocampus_de_cell_types, file.path(dir.out, "hippocampus_sens_global"),
   marker_list = hippocampus_markers,
   confidence_percentile = 0.15,
   confidence_categories = NULL,
   run_label = "sens_global",
   prefilter_objects = hippocampus_results$sample_objects_prefilter)
 
+# Near-tie categories: more than 15% of a category's cells below the pooled
+# 15th-percentile margin in the primary run. The recorded list (12-panel run,
+# 2026-10-06) is used; the same rule is now computed from the primary run and
+# any difference is reported (audit finding R6, decision 10).
 hippocampus_near_tie_cats <- c("BAM", "Ependymal/ciliated", "Microglia (Active)")
+hippocampus_near_tie_computed <- near_tie_categories(hippocampus_results$sample_objects_prefilter, 0.15, 0.15)
+if (!setequal(hippocampus_near_tie_computed, hippocampus_near_tie_cats))
+  warning("Hippocampus: computed near-tie list (", paste(hippocampus_near_tie_computed, collapse = ", "),
+          ") differs from the recorded list (", paste(hippocampus_near_tie_cats, collapse = ", "),
+          "); the recorded list is used. See issue #6, finding R6.", call. = FALSE)
 
 hippocampus_sens_neartie <- run_region_pipeline(
   sample_base, hippocampus_lassos, "Hippocampus",
-  hippocampus_de_cell_types, "outputs/hippocampus_sens_neartie",
+  hippocampus_de_cell_types, file.path(dir.out, "hippocampus_sens_neartie"),
   marker_list = hippocampus_markers,
   confidence_percentile = 0.15,
   confidence_categories = hippocampus_near_tie_cats,
@@ -57,13 +66,13 @@ hippocampus_sens_neartie <- run_region_pipeline(
 
 optic_tract_results <- run_region_pipeline(
   sample_base, optic_tract_lassos, "Optic Tract",
-  optic_tract_de_cell_types, "outputs/optic_tract_newlasso_unfiltered",
+  optic_tract_de_cell_types, file.path(dir.out, "optic_tract_newlasso_unfiltered"),
   marker_list = optic_tract_markers,
   run_label = "primary")
 
 optic_tract_sens_global <- run_region_pipeline(
   sample_base, optic_tract_lassos, "Optic Tract",
-  optic_tract_de_cell_types, "outputs/optic_tract_newlasso_sens_global",
+  optic_tract_de_cell_types, file.path(dir.out, "optic_tract_newlasso_sens_global"),
   marker_list = optic_tract_markers,
   confidence_percentile = 0.15,
   confidence_categories = NULL,
@@ -72,10 +81,15 @@ optic_tract_sens_global <- run_region_pipeline(
 
 optic_tract_near_tie_cats <- c("Choroid plexus", "Neutrophil", "GABAergic interneuron",
                                "Peripheral macrophage", "B cell", "BAM")
+optic_tract_near_tie_computed <- near_tie_categories(optic_tract_results$sample_objects_prefilter, 0.15, 0.15)
+if (!setequal(optic_tract_near_tie_computed, optic_tract_near_tie_cats))
+  warning("Optic tract: computed near-tie list (", paste(optic_tract_near_tie_computed, collapse = ", "),
+          ") differs from the recorded list (", paste(optic_tract_near_tie_cats, collapse = ", "),
+          "); the recorded list is used. See issue #6, finding R6.", call. = FALSE)
 
 optic_tract_sens_neartie <- run_region_pipeline(
   sample_base, optic_tract_lassos, "Optic Tract",
-  optic_tract_de_cell_types, "outputs/optic_tract_newlasso_sens_neartie",
+  optic_tract_de_cell_types, file.path(dir.out, "optic_tract_newlasso_sens_neartie"),
   marker_list = optic_tract_markers,
   confidence_percentile = 0.15,
   confidence_categories = optic_tract_near_tie_cats,
@@ -83,7 +97,9 @@ optic_tract_sens_neartie <- run_region_pipeline(
   prefilter_objects = optic_tract_results$sample_objects_prefilter)
 
 # ---- Robustness tables: TBI (gi) minus sham (gii), percentage points ----
-# "flips" = direction changes in at least one sensitivity run.
+# "flips" = direction changes in at least one sensitivity run. A category
+# absent from one of the three runs gives NA in that column; such rows are
+# reported with a message rather than sorted away silently (audit finding B8).
 robustness_table <- function(primary, global, neartie) {
   diff_tbl <- function(res) {
     cd <- res$composition$composition_df
@@ -94,19 +110,24 @@ robustness_table <- function(primary, global, neartie) {
   cats <- union(union(names(d1), names(d2)), names(d3))
   out <- data.frame(cell_type = cats, unfiltered = d1[cats], global = d2[cats],
                     neartie = d3[cats], row.names = NULL)
-  out$flips <- with(out, sign(global) != sign(unfiltered) | sign(neartie) != sign(unfiltered))
-  out$max_shift <- with(out, pmax(abs(global - unfiltered), abs(neartie - unfiltered)))
+  sign_flip <- function(a, b) !is.na(a) & !is.na(b) & sign(a) != sign(b)
+  out$flips <- with(out, sign_flip(global, unfiltered) | sign_flip(neartie, unfiltered))
+  out$max_shift <- with(out, pmax(abs(global - unfiltered), abs(neartie - unfiltered), na.rm = TRUE))
+  incomplete <- out$cell_type[is.na(out$unfiltered) | is.na(out$global) | is.na(out$neartie)]
+  if (length(incomplete) > 0)
+    message("robustness_table: category absent from at least one run (NA in the table): ",
+            paste(incomplete, collapse = ", "))
   out[order(-out$max_shift), ]
 }
 
 write.csv(robustness_table(hippocampus_results, hippocampus_sens_global, hippocampus_sens_neartie),
-          "outputs/hippocampus_near_tie_sensitivity.csv", row.names = FALSE)
+          file.path(dir.out, "hippocampus_near_tie_sensitivity.csv"), row.names = FALSE)
 write.csv(robustness_table(optic_tract_results, optic_tract_sens_global, optic_tract_sens_neartie),
-          "outputs/optic_tract_near_tie_sensitivity.csv", row.names = FALSE)
+          file.path(dir.out, "optic_tract_near_tie_sensitivity.csv"), row.names = FALSE)
 
 # ---- Composition stats: Welch t-test + BH, sample as the unit ----
 write.csv(build_stats_table(hippocampus_results$composition$composition_df),
-          "outputs/hippocampus_unfiltered_stats_table.csv", row.names = FALSE)
+          file.path(dir.out, "hippocampus_unfiltered_stats_table.csv"), row.names = FALSE)
 
 # ---- Diagnostics: single-gene driver checks, hippocampus (2026-10-06) ----
 # Choroid plexus: Kl alone (66-98% of calls; Folr1/Otx2 ~1%), ~74% neuronal
@@ -115,17 +136,24 @@ write.csv(build_stats_table(hippocampus_results$composition$composition_df),
 # Ependymal/ciliated: mostly Foxj1-driven, but some calls line the outer
 #   (ventricular) edge -> mixed real edge cells + scattered noise. Kept;
 #   reported as not robust.
-# Uses the 13-panel run (before Choroid plexus was excluded):
-hc_objs <- readRDS("outputs/hippocampus_unfiltered_withCP/sample_objects_prefilter.rds")
+# Uses the 13-panel run (before Choroid plexus was excluded). That run is not
+# produced by this script any more, so its checkpoint exists only on the disk
+# where it was made; see issue #9 (audit finding R4) for regenerating it.
+hc_ckpt <- file.path(dir.out, "hippocampus_unfiltered_withCP", "sample_objects_prefilter.rds")
+if (!file.exists(hc_ckpt)) {
+  message("Diagnostics skipped: 13-panel checkpoint not found at ", hc_ckpt, " (see issue #9).")
+} else {
+  hc_objs <- readRDS(hc_ckpt)
 
-write.csv(driver_check(hc_objs, "Choroid plexus", c("Folr1", "Kl", "Otx2")),
-          "outputs/hippocampus_choroid_plexus_gene_detection.csv", row.names = FALSE)
-write.csv(runner_up_summary(hc_objs, "Choroid plexus"),
-          "outputs/hippocampus_choroid_plexus_runner_up.csv", row.names = FALSE)
-plot_category_spatial(hc_objs, "Choroid plexus", "outputs/hippocampus_choroid_plexus_spatial.png")
+  write.csv(driver_check(hc_objs, "Choroid plexus", c("Folr1", "Kl", "Otx2")),
+            file.path(dir.out, "hippocampus_choroid_plexus_gene_detection.csv"), row.names = FALSE)
+  write.csv(runner_up_summary(hc_objs, "Choroid plexus"),
+            file.path(dir.out, "hippocampus_choroid_plexus_runner_up.csv"), row.names = FALSE)
+  plot_category_spatial(hc_objs, "Choroid plexus", file.path(dir.out, "hippocampus_choroid_plexus_spatial.png"))
 
-write.csv(driver_check(hc_objs, "Ependymal/ciliated", c("Foxj1", "Pifo", "Dnah12")),
-          "outputs/hippocampus_ependymal_gene_detection.csv", row.names = FALSE)
-write.csv(runner_up_summary(hc_objs, "Ependymal/ciliated"),
-          "outputs/hippocampus_ependymal_runner_up.csv", row.names = FALSE)
-plot_category_spatial(hc_objs, "Ependymal/ciliated", "outputs/hippocampus_ependymal_spatial.png")
+  write.csv(driver_check(hc_objs, "Ependymal/ciliated", c("Foxj1", "Pifo", "Dnah12")),
+            file.path(dir.out, "hippocampus_ependymal_gene_detection.csv"), row.names = FALSE)
+  write.csv(runner_up_summary(hc_objs, "Ependymal/ciliated"),
+            file.path(dir.out, "hippocampus_ependymal_runner_up.csv"), row.names = FALSE)
+  plot_category_spatial(hc_objs, "Ependymal/ciliated", file.path(dir.out, "hippocampus_ependymal_spatial.png"))
+}

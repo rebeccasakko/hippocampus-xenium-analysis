@@ -38,5 +38,25 @@ apply_confidence_filter_pooled <- function(sample_list, percentile = 0.15, categ
     "apply_confidence_filter_pooled: %.0fth percentile of pooled margins = %.4f (n = %d cells, %d samples); %d cells reclassified; scope: %s",
     percentile * 100, threshold, length(all_margins), length(sample_list), n_changed,
     if (is.null(categories)) "all categories" else paste(categories, collapse = ", ")))
+  attr(out, "threshold") <- threshold   # recorded in run_info.txt by run_region_pipeline() (audit R5)
   out
+}
+
+# near_tie_categories(): the categories eligible for the sens_neartie run,
+# computed from the PRIMARY run's objects by the rule stated in README and
+# R/run_analyses.R: categories (cell_type) in which more than `min_share` of
+# cells fall below the pooled `percentile` margin threshold. "Unclassified"
+# is never returned (reassigning it is a no-op). Before the audit (issue #6,
+# finding R6) the list was typed into R/run_analyses.R by hand from the
+# printed margins; R/run_analyses.R now computes it, prints the shares, and
+# warns if it differs from the recorded list (which stays in use, decision 10).
+near_tie_categories <- function(sample_list, percentile = 0.15, min_share = 0.15) {
+  m  <- unlist(lapply(sample_list, function(o) o$classification_margin))
+  ct <- unlist(lapply(sample_list, function(o) as.character(o$cell_type)))
+  thr <- as.numeric(quantile(m, percentile, na.rm = TRUE))
+  share <- sort(tapply(m < thr, ct, mean, na.rm = TRUE), decreasing = TRUE)
+  message(sprintf("near_tie_categories: threshold %.4f (%.0fth percentile); share of cells below it: %s",
+                  thr, percentile * 100,
+                  paste(sprintf("%s %.1f%%", names(share), 100 * share), collapse = ", ")))
+  setdiff(names(share)[share > min_share], "Unclassified")
 }
