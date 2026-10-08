@@ -14,7 +14,8 @@
 # (all 6 samples) without group labels.
 # ============================================================
 
-setwd("~/Documents/GitHub/hippocampus-xenium-analysis")
+# Working directory: open the repository folder in RStudio (hippocampus-xenium-analysis.Rproj
+# is the root anchor); R/run_full_pipeline.R stops with a message if it is not the root.
 source("R/run_full_pipeline.R")   # setup only: functions, panels, lassos
 
 # ---- Hippocampus (12 panels; Choroid plexus excluded 2026-10-06) ----

@@ -22,5 +22,5 @@ plot_lasso_overview <- function(sample_base, lassos, region_label, out_file) {
                   x = "x (um)", y = "y (um)") +
     ggplot2::theme_classic()
   ggplot2::ggsave(out_file, g, width = 12, height = 8, dpi = 200)
-  print(g)   # also show in the Plots pane
+  if (interactive()) print(g)   # also show in the Plots pane (skipped under Rscript)
 }

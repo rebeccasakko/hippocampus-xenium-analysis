@@ -33,7 +33,9 @@
 # an artifact of astrocyte segmentation bleed.
 # ============================================================
 
-library(tidyverse)
+library(dplyr)    # dplyr, tibble and ggplot2 are in the required package list (R/_setup.R);
+library(tibble)   # tidyverse itself is not a dependency of this repository
+library(ggplot2)
 library(Seurat)
 
 # Build the per-cell diagnostic table for one marker-spillover check.
