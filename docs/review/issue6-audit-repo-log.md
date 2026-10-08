@@ -9,7 +9,7 @@ Mode: audit (degraded: this session cannot run the code; runs are handed to the 
 Org profile: default
 Reviewer: Holden Harris (holden-harris), with Claude Code        Original author: rebeccasakko
 Line numbers refer to commit: 869af28 (code unchanged by 2a1df70, which added the two review drafts)
-Last completed step: §5 step 5 (portability code)        Next step: pause 7, then §5 step 6; step 2 baseline result pending from the author        Last updated: 2026-10-07
+Last completed step: §5 step 8 (documentation)        Next step: §5 step 11 drafts (README, CLAUDE.md, PR description); steps 9-10 wait for the author; step 2 baseline result pending from the author        Last updated: 2026-10-07
 ```
 
 ## 1. Scope and targets
@@ -322,9 +322,9 @@ any regenerated outputs are committed; pause 9 before any `git rm --cached` (non
 - [x] 3. Phase 5 static review: registers completed; workflow review §3-§8; science review §5-§7. (record; `9dfcd45`)
 - [x] 4. Pause 5 statuses, §4 fix design, this plan, decisions 5-10, §8 entries, sub-issues #8 and #9 opened and linked under #6. (record)
 - [x] 5. Portability (`26d5d98`): track `.Rproj`; root anchor, SETTINGS block and `config.local.R` sourcing in `R/run_full_pipeline.R`; `R/_setup.R`; `config.local.example.R`; `setwd()` removed; `tidyverse` removed; prints guarded; old lassos to the example; `.gitignore` `data/`. (code; P1-P6, E3, E4) **Pause 7 after this step.**
-- [ ] 6. Provenance outputs: composition, DE, depth and panel-status tables; `run_info.txt` with stage timings; `session_info.txt`; DESeq2 diagnostics. (code; R1, R2, R3, R5, B4, B6, M8, T1)
-- [ ] 7. Robustness: group from metadata; `layer=`; NA-safe flips; lasso selection warning; checkpoint sidecar; near-tie list computed and compared; skip toggle. (code; B2, B5, B7, B8, R6, R7, T2)
-- [ ] 8. Documentation fixes in protocols, comments and README. (docs; D1-D6, D9, M9, S1)
+- [x] 6. Provenance outputs (`cc60d9f`): composition, DE, depth and panel-status tables; `run_info.txt` with stage timings; `session_info.txt`; DESeq2 diagnostics. (code; R1, R2, R3, R5, B4, B6, M8, T1)
+- [x] 7. Robustness (`cc60d9f`): group from metadata; `layer=`; NA-safe flips; lasso selection warning; checkpoint sidecar; near-tie list computed and compared; skip toggle. (code; B2, B5, B7, B8, R6, R7, T2)
+- [x] 8. Documentation fixes (`d839f59`) in protocols, comments and README. (docs; D1-D6, D9, M9, S1)
 - [ ] 9. Baseline result recorded when the author's log arrives: workflow review §9.1 result line, stage table, comparison table; T1 measured. (record)
 - [ ] 10. Phase 8 verification on the author's machine and, if the data can be placed, on the analyst's: fresh clone without data; fresh clone with data and `config.local.R`; interactive run; fingerprints compared; convention checks. (record) **Pause 8 if any tracked output is to be regenerated and committed.**
 - [ ] 11. README and `CLAUDE.md` sync from the review documents; PR description; pre-ready check; §11 closing summary. (docs) **Pause 10.**
@@ -340,6 +340,8 @@ any regenerated outputs are committed; pause 9 before any `git rm --cached` (non
 | `9dfcd45` | record | none | static evidence in §3 (md5 of DE heatmaps; robustness and stats tables recomputed; DE tables recounted) | findings log §2 (B5-B8, D9, M10, M11); workflow review §3-§8; science review §5-§7 |
 | `72a2a34` | record | none | none | findings log §2 statuses, §4, §5, §7 (decisions 5-10), §8, §10 (sub-issues #8, #9) |
 | `26d5d98` | code | P1-P6, E3, E4 | 21/21 files parse; anchor stop from a temp dir; package-check stop at the root; OK/MISSING table and stop on a temp tree; override test; author examples identical() to the removed literals (commit body) | findings log §5, §6; workflow review §2 (step 8) |
+| `cc60d9f` | code | R1, R2, R3, R5, R6, R7, B2, B4, B5, B6, B7, B8, M8, T1 (lines), T2 | robustness table byte-identical from committed tables; mocks for near-tie, filter, cell-count table; git head equals git rev-parse; 21/21 parse (commit body) | findings log §5, §6 |
+| `d839f59` | docs | D1, D2, D3, D5, D6, D9, M9, S1 | prose only; 21/21 files parse | protocols, README, comments in four R files |
 
 ## 7. Decisions log
 
