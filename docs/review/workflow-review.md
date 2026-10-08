@@ -158,8 +158,28 @@ To be filled in Phases 4 and 5.
 
 ### 9.1 As-found baseline
 
-Pending: run on the author's machine (Phase 4 hand-off). The analyst's machine has neither the data
-nor Seurat and DESeq2, so no run can be made here.
+**Result: pending, run on the author's machine** (hand-off block in the findings log §3, posted on
+PR #7 on 2026-10-07). The analyst's machine has neither the data nor Seurat and DESeq2, so no run
+can be made here.
+
+Baseline notes, written before the run:
+
+- The baseline is run on branch `6-audit-repo`, which differs from `main` (869af28) in exactly one
+  character of code: the misplaced parenthesis in `R/build_stats_table.R:31` (finding B1, decision
+  4). Without it `source("R/run_full_pipeline.R")` stops at line 65 with `unexpected '}'`, so no run
+  of any kind is possible at 869af28. Evidence that the fix changes nothing: with the corrected
+  function, the committed `outputs/hippocampus_unfiltered/composition_per_sample.csv` gives a stats
+  table whose 15 p-values and BH-adjusted p-values match the committed
+  `outputs/hippocampus_unfiltered_stats_table.csv` to 1.6e-14 and 5.1e-15 in the same row order;
+  the CSV is not byte-identical only because the last printed digit of some doubles and the line
+  endings differ between the analyst's Windows R 4.5.3 and the author's machine.
+- Smoke checks on 2026-10-07 (analyst's machine, parse-only): root anchor absent (P3); 19 of 19
+  files parse after the fix (18 of 19 before it, B1); the package check and the input check cannot
+  run here (no Seurat/DESeq2, no data) and are handed to the author with the baseline.
+- The hand-off asks for the hippocampus block first (three runs plus the robustness and stats
+  tables), the optic tract block if time allows, and the diagnostics block only if the 13-panel
+  checkpoint still exists on the author's disk (R4). Fingerprints of `outputs/` are taken before
+  and after with `tools::md5sum()`; the comparison table goes here when the CSVs arrive.
 
 ### 9.3 As-left verification
 

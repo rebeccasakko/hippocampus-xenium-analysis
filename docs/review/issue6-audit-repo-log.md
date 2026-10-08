@@ -4,12 +4,12 @@
 
 ```
 Issue: #6 (https://github.com/rebeccasakko/hippocampus-xenium-analysis/issues/6)
-Branch: 6-audit-repo        Pull request: pending (draft, opened in Phase 3 step 5)
+Branch: 6-audit-repo        Pull request: #7 (draft, https://github.com/rebeccasakko/hippocampus-xenium-analysis/pull/7)
 Mode: audit (degraded: this session cannot run the code; runs are handed to the author)
 Org profile: default
 Reviewer: Holden Harris (holden-harris), with Claude Code        Original author: rebeccasakko
 Line numbers refer to commit: 869af28 (code unchanged by 2a1df70, which added the two review drafts)
-Last completed step: §5 step 1 (docs commit)        Next step: §5 step 2 (baseline hand-off)        Last updated: 2026-10-07
+Last completed step: §5 step 2a (B1 parse fix)        Next step: §5 step 2 (baseline: hand-off posted, result pending)        Last updated: 2026-10-07
 ```
 
 ## 1. Scope and targets
@@ -77,7 +77,7 @@ row cites 869af28.
 
 | ID | Where | Problem | Kind | Severity | Status |
 |---|---|---|---|---|---|
-| B1 | `R/build_stats_table.R:31` | `t.test(pct ~ group_id, data = pick(everything())$p.value, error = function(e) NA_real_)`: the closing parenthesis of `t.test()` is misplaced, so the file does not parse (`38:1: unexpected '}'`) and `source("R/run_full_pipeline.R")` stops at line 65 for every user. Found by the parse sweep on 2026-10-07 (18 of 19 files parse). The committed stats table predates the edit and recomputes from the committed composition table with the corrected call (max p difference 1.6e-14) | mechanical | high | open |
+| B1 | `R/build_stats_table.R:31` | `t.test(pct ~ group_id, data = pick(everything())$p.value, error = function(e) NA_real_)`: the closing parenthesis of `t.test()` is misplaced, so the file does not parse (`38:1: unexpected '}'`) and `source("R/run_full_pipeline.R")` stops at line 65 for every user. Found by the parse sweep on 2026-10-07 (18 of 19 files parse). The committed stats table predates the edit and recomputes from the committed composition table with the corrected call (max p difference 1.6e-14). Fixed before the baseline because it prevents any run at all (decision 4) | mechanical | high | fix: step 2a (decision 4) |
 | B2 | `R/process_sample_template.R:11-13` vs `R/run_full_pipeline.R:76-78` | Point-in-polygon treats the whole lasso CSV as one polygon and ignores `Selection`; the area function splits by `Selection` and sums. A file holding more than one selection is joined into one wrong outline by the first and measured correctly by the second, with no check on the number of selections (carry-over from PR #3 review, item V) | mechanical (check) / scientific (if a file has several selections) | medium | open |
 | B3 | `R/classify_atlas_index.R:46` | State refinement `ifelse(StateA1 > StateB1, ...)`: exact ties and cells with no signal from either state panel go to Homeostatic/Precursor; no "cannot tell" state (carry-over item K) | scientific | low | open |
 | B4 | `R/run_full_pipeline.R:118` | `dir.create(output_dir, recursive = TRUE)` is correct, but every writer (`write.csv`, `ggsave`, `png`) overwrites silently, so a second run into a folder of a different run label mixes files; no run label or commit is written into the outputs | mechanical | low | open |
@@ -159,8 +159,61 @@ Rows here are questions for the author (§8) unless marked otherwise; the arithm
 
 ### Hand-off block for the baseline (pause 4)
 
-To be pasted to the author after the parse fix question is settled (B1 blocks `source()`; see §5
-step 2 and decision 4).
+Posted as a comment on PR #7 for the author on 2026-10-07. The branch they run is `6-audit-repo`
+after the B1 parse fix (step 2a); no other code differs from `main`. Everything the block produces
+lands in `../hippocampus-xenium-analysis-audit/<date>/`, outside the repository.
+
+```
+Run this on your Mac, then paste back the four items at the end (as a comment on PR #7).
+
+1. Get the branch (your working tree must be clean; commit or stash anything pending):
+     cd ~/Documents/GitHub/hippocampus-xenium-analysis
+     git fetch origin && git checkout 6-audit-repo
+   The only code difference from main is a one-character fix in R/build_stats_table.R
+   that lets source("R/run_full_pipeline.R") work again.
+
+2. In RStudio, open the project folder as usual, then in the console (base R only):
+     stamp <- format(Sys.Date(), "%Y%m%d")
+     A <- file.path("..", "hippocampus-xenium-analysis-audit", stamp); dir.create(A, recursive = TRUE)
+     f <- list.files("outputs", recursive = TRUE, full.names = TRUE)
+     write.csv(data.frame(file = f, md5 = unname(tools::md5sum(f))), file.path(A, "md5_before.csv"), row.names = FALSE)
+     sink(file.path(A, "run_hippocampus.log"), split = TRUE)
+     t0 <- Sys.time(); print(t0)
+     source("R/run_full_pipeline.R")
+
+3. Run the HIPPOCAMPUS block of R/run_analyses.R exactly as you normally do (lines 29-53:
+   hippocampus_results, hippocampus_sens_global, hippocampus_sens_neartie), then the two
+   write.csv lines for the hippocampus robustness and stats tables (lines 101-102 and 107-108).
+   Do not run setwd() on line 17 (you are already in the folder). Print the time after each run:
+     print(Sys.time() - t0)
+
+4. When the hippocampus block has finished:
+     print(Sys.time() - t0); sink()
+     f <- list.files("outputs", recursive = TRUE, full.names = TRUE)
+     write.csv(data.frame(file = f, md5 = unname(tools::md5sum(f))), file.path(A, "md5_after.csv"), row.names = FALSE)
+     writeLines(capture.output(sessionInfo()), file.path(A, "sessionInfo.txt"))
+     file.copy("outputs", A, recursive = TRUE)
+     # one quick check for the audit (B2): how many selections does each lasso file hold?
+     sapply(c(hippocampus_lassos, optic_tract_lassos), function(p) if (file.exists(p)) length(unique(read.csv(p, skip = 2)$Selection)) else NA)
+
+5. Optional, if you have the time: the OPTIC TRACT block (lines 57-82 and 103-104) the same way,
+   into a second log (run_optic_tract.log). The diagnostics block (lines 118-130) only if
+   outputs/hippocampus_unfiltered_withCP/sample_objects_prefilter.rds still exists on your disk.
+
+6. Do NOT commit the regenerated outputs/; after step 4 you can restore them with
+     git checkout -- outputs
+   (the copies are safe in the audit folder).
+
+Paste back:
+  a. run_hippocampus.log (whole file if under ~300 lines, else the last 60 lines plus every line
+     containing "Error", "Warning" or "apply_confidence_filter_pooled"), and the printed times.
+  b. sessionInfo.txt.
+  c. md5_before.csv and md5_after.csv.
+  d. The lasso selection counts from step 4.
+```
+
+Until these arrive, the workflow review §9.1 and every run-time cell read "pending: run on the
+author's machine".
 
 ## 4. Recommended changes (fix design)
 
@@ -170,7 +223,8 @@ To be written in Phase 6 after pause 5.
 
 - [x] 0. GitHub scaffold: issue #6, branch `6-audit-repo`, `.gitignore` additions (`config.local.R`, `hoard/`, `Rplots.pdf`). (housekeeping, part of step 1's commit)
 - [x] 1. Commit this findings log and the science and workflow review drafts; push; open the draft pull request. (docs)
-- [ ] 2. Baseline: hand-off block to the author; record the result in the workflow review §9 as-found when it arrives. (record)
+- [x] 2a. Minimal pre-baseline fix: the misplaced parenthesis in `R/build_stats_table.R:31`, because it blocks every run (B1; decision 4). Evidence: 19 of 19 files parse; the recomputed stats table matches the committed one. (code)
+- [ ] 2. Baseline: hand-off block posted on PR #7 for the author; record the result in the workflow review §9 as-found when it arrives. (record)
 - [ ] 3. Phase 5 review: complete the eight registers; fill the workflow review §3-§8; correct the science review §5-§7. (record)
 - [ ] 4. Pause 5 and Phase 6: statuses per row; §4 fix design; this plan rewritten with commit types and IDs. (record)
 - [ ] 5+. Implementation steps, from Phase 6.
@@ -179,13 +233,16 @@ To be written in Phase 6 after pause 5.
 
 | Commit | Kind | IDs closed | Evidence | Documents updated |
 |---|---|---|---|---|
-| pending | docs | none | none | science review §0-5, workflow review §1-2, findings log created |
+| `2a1df70` | docs | none | none | science review §0-5 and workflow review §1-2 drafts (committed by the analyst on `main`) |
+| `2f414b9` | docs | none | none | findings log created; `.gitignore` (`config.local.R`, `hoard/`, `Rplots.pdf`); issue number filled in |
+| `d17429b` | code | B1 | 19/19 files parse; stats table recomputed from the committed composition table (see §3) | findings log §2.3, §5, §7 |
 
 ## 7. Decisions log
 
 1. **2026-10-07 (Holden Harris):** Mode `audit`, degraded; the analyst is a collaborator and the author reviews the PR; the whole repository is in scope; FLASH-MM out of scope; methods and statistics are reviewed in depth and recorded as questions for the author, never changed in this PR. (scope)
 2. **2026-10-07 (Holden Harris):** The committed `outputs/` at 869af28 are the reference outputs. (scope)
 3. **2026-10-07 (Holden Harris):** The baseline run is made by the author on their Mac from a hand-off block; nothing is recorded as measured until their log arrives. (scope)
+4. **2026-10-07 (Holden Harris, with Claude Code):** Fix B1 (one misplaced parenthesis in `R/build_stats_table.R:31`) before the baseline, because at 869af28 `source("R/run_full_pipeline.R")` fails for everyone and no run of any kind is possible; the skill allows the minimum fix in that case. Mechanical: the recomputed stats table equals the committed one. Recorded in the workflow review §9.1 baseline notes. (B1)
 
 ## 8. Needs examination (for the original author)
 
@@ -204,8 +261,9 @@ Populated at Phase 5 from the M rows and B2/B3; each item gets a sub-issue.
 
 ## 10. GitHub record
 
-Issue #6; branch `6-audit-repo` created from the issue's Development link; draft PR against `main`
-with `Fixes #6` and the §9 checklist (number recorded when opened). Merge policy: merge commit, delete
+Issue #6; branch `6-audit-repo` created from the issue's Development link (`gh issue develop`);
+draft PR #7 against `main` with `Fixes #6` and the §9 checklist, opened 2026-10-07 after commit
+`2f414b9`. Merge policy: merge commit, delete
 branch. Sub-issues for §8 items opened in Phase 6.
 
 ## 11. Closing summary
