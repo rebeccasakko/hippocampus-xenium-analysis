@@ -13,11 +13,15 @@
 # default regardless of what the data happen to look like.
 #
 # Benjamini-Hochberg correction is applied across however many
-# cell-type categories are actually tested for a given region (16
-# for Hippocampus's full panel; fewer for Optic Tract, since several
-# panels are excluded there -- see R/marker_panels.R) rather than a
+# cell-type categories are actually tested for a given region (15 for
+# the 12-panel hippocampus run: 12 identities, three of them split into
+# two states, plus Unclassified; a different number for the optic tract,
+# whose candidate list differs -- see R/marker_panels.R) rather than a
 # fixed number, so the correction always reflects the real multiple-
-# comparisons burden for that region's own candidate list.
+# comparisons burden for that region's own candidate list. The
+# percentages are compositional (they sum to 100 within a mouse) and
+# "Unclassified" is tested like any category; both are known
+# limitations of this per-category test (audit issue #6, finding M5).
 # ============================================================
 
 # `composition_df` is the per-sample, per-category data.frame returned
@@ -28,7 +32,7 @@ build_stats_table <- function(composition_df) {
         group_by(cell_type) %>%
         summarise(
             p_value = tryCatch(
-                t.test(pct ~ group_id, data = pick(everything())$p.value,
+                t.test(pct ~ group_id, data = pick(everything()))$p.value,
                 error = function(e) NA_real_
             ),
             .groups = "drop"

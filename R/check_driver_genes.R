@@ -50,6 +50,6 @@ plot_category_spatial <- function(objs, category, out_file,
     ggplot2::labs(title = paste0("'", category, "' calls (red) vs ",
                                  paste(context, collapse = "/"), " (blue)"))
   ggplot2::ggsave(out_file, g, width = 12, height = 7, dpi = 200)
-  print(g)
+  if (interactive()) print(g)
   invisible(g)
 }

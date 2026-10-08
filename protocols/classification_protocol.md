@@ -37,20 +37,25 @@ don't conflate the two.)
 4. **Per-cell atlas classification** (`classify_atlas_index()`,
    `R/classify_atlas_index.R`, marker panels in `R/marker_panels.R`).
    For each atlas cell-type panel in the candidate list passed as
-   `marker_list` (defaults to the full `atlas_index_markers`, ~13 panels
-   for hippocampus; optic tract uses `optic_tract_markers`, which drops
-   two panels -- see "Region-specific candidate panel set" below), every
-   cell gets a `Seurat::AddModuleScore()` value for that panel. Scores are
-   z-scored across cells *within each panel*, and each cell's top-level
-   identity (`atlas_identity`) is the panel with the highest z-scored score
-   (argmax). The margin between the best and second-best panel is recorded
-   (`classification_margin`), and the second-best panel is recorded too
-   (`runner_up`) -- both useful for spotting ambiguous calls.
+   `marker_list` (`hippocampus_markers`, 12 panels, since Choroid plexus was
+   excluded on 2026-10-06; `optic_tract_markers`, 16 panels, which drops
+   four panels and adds six immune panels -- see "Region-specific candidate
+   panel set" below and `R/marker_panels.R`), every cell gets a
+   `Seurat::AddModuleScore()` value for that panel. Scores are z-scored
+   across the cells of that sample *within each panel*, and each cell's
+   top-level identity (`atlas_identity`) is the panel with the highest
+   z-scored score (argmax). The margin between the best and second-best
+   panel is recorded (`classification_margin`), and the second-best panel
+   is recorded too (`runner_up`) -- both useful for spotting ambiguous calls.
 
    A panel is excluded from scoring in a given sample if its single
    best-detected marker gene is expressed in fewer than 0.5% of cells
    (`min_detect_rate`) -- a module score built on that sparse a signal is
-   noise-dominated and can win the argmax spuriously.
+   noise-dominated and can win the argmax spuriously. The floor and the
+   z-scores are computed on the cells inside the lasso that passed QC
+   (classification runs after the spatial restriction), so the decision is
+   per sample and per region; which panels were scored in which sample is
+   written to `panel_status_per_sample.csv` in every run folder.
 
 5. **State refinement for Astrocyte / Microglia / Oligodendrocyte lineage.**
    Cells classified into these three top-level identities are re-scored
@@ -102,10 +107,14 @@ are excluded from the Optic Tract candidate list specifically (see below).
 ### Region-specific candidate panel set (Optic Tract)
 
 `optic_tract_markers` (`R/marker_panels.R`) is `atlas_index_markers` with
-Hippocampal pyramidal and Dentate gyrus granule removed, and is what
-`run_region_pipeline()` actually passes as `marker_list` when classifying
-Optic Tract samples (hippocampus continues to use the full, unrestricted
-`atlas_index_markers`).
+Hippocampal pyramidal, Dentate gyrus granule, RGC (sanity check) and
+Ependymal/ciliated removed (the latter two for the reasons in the two
+subsections that follow), and is what `run_region_pipeline()` passes as
+`marker_list` when classifying Optic Tract samples. The hippocampus uses
+`hippocampus_markers`: `atlas_index_markers` without the six immune panels
+and RGC added for the optic tract, and, since 2026-10-06, without Choroid
+plexus (12 panels; see `R/marker_panels.R:85-96` and
+`outputs/hippocampus_choroid_plexus_*` for the driver-gene evidence).
 
 This was not the first response to the problem. Both panels were initially
 left in as candidates everywhere, on the assumption that the argmax
@@ -235,7 +244,7 @@ noise-averaging effect of clustering.
 
 ## Outputs
 
-- `atlas_identity` -- top-level cell-type call (~13 categories + Unclassified)
+- `atlas_identity` -- top-level cell-type call (12 categories in the hippocampus, 16 in the optic tract, plus Unclassified)
 - `cell_type` -- `atlas_identity`, with Astrocyte/Microglia/Oligodendrocyte
   lineage further split into their state-refined subtypes
 - `classification_margin` -- gap between the winning and runner-up panel's
@@ -273,11 +282,21 @@ population found in the RGC (sanity check) diagnostic before RGC was
 excluded (RGC's margin distribution was cleanly bimodal, with the
 noise-driven half fully separated from the confident half by a wide gap;
 15% was the smallest percentile threshold that captured all of the
-noise-driven half with minimal cost elsewhere). Hippocampus is not (yet)
-using this mechanism -- it still runs on the original BAM-specific
-`margin > 1` fix. **Before final submission**: re-derive Hippocampus's
-threshold the same percentile-based way for methodological consistency
-between regions, rather than leaving it on the older ad hoc fix.
+noise-driven half with minimal cost elsewhere). Since 2026-10-06 the
+hippocampus uses the same design: an unfiltered primary run plus two
+sensitivity runs at its own pooled 15th percentile (0.1745 with the
+12-panel set; the earlier BAM-only `margin > 1` rule is retired). In both
+regions the filter is applied only in the sensitivity runs, never in the
+primary run; the "near-tie" category list for `sens_neartie` is the set of
+categories in which more than 15% of cells fall below the threshold in the
+primary run, computed by `near_tie_categories()` and recorded in
+`R/run_analyses.R`. The filter rewrites `cell_type` only; the differential
+expression step selects cells by `atlas_identity`, so the sensitivity runs
+change composition but not DE (audit issue #6, finding M2; whether that is
+the intended design is a question for the author in issue #8). Note that
+the 15% figure was chosen on the optic tract and reused for the hippocampus
+for comparability; a 10th/25th percentile check is listed under README
+"Open items".
 
 ## QC checks
 

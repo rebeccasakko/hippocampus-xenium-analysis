@@ -54,11 +54,16 @@ plot_de_heatmap <- function(dds, genes, sig_lookup, cell_type_label, filename) {
                           rownames(z), paste0(rownames(z), " ", sig_lookup[rownames(z)]))
 
     sample_order <- colnames(z)
-    group_of     <- ifelse(grepl("^gi-", sample_order), "gi", "gii")  # NOTE: "^gi-" not "^gi" -- "gii" also starts with "gi"
+    # Group from the DESeqDataSet's own colData (set from group_id metadata in
+    # build_pseudobulk_dds(); audit finding B5), with the name-based rule as the
+    # fallback. NOTE for the fallback: "^gi-" not "^gi" -- "gii" also starts with "gi".
+    grp_all  <- setNames(as.character(dds$group), colnames(dds))
+    group_of <- unname(grp_all[sample_order])
+    if (anyNA(group_of)) group_of <- ifelse(grepl("^gi-", sample_order), "gi", "gii")
     ordered_samples <- c(sample_order[group_of == "gi"], sample_order[group_of == "gii"])
     z <- z[, ordered_samples, drop = FALSE]
 
-    group_anno <- data.frame(Group = ifelse(grepl("^gi-", ordered_samples), "gi", "gii"))
+    group_anno <- data.frame(Group = group_of[match(ordered_samples, sample_order)])
     rownames(group_anno) <- ordered_samples
     ann_colors <- list(Group = c(gi = "#5BC8C2", gii = "#F2A8A0"))
 
@@ -77,7 +82,8 @@ plot_de_heatmap <- function(dds, genes, sig_lookup, cell_type_label, filename) {
     invisible(p)
 }
 
-# ---- Wilcoxon primary analysis: genes are whatever cleared padj_cutoff ----
+# ---- Wilcoxon secondary (exploratory) analysis: genes are whatever cleared padj_cutoff ----
+# (p_val_adj from FindMarkers() is Bonferroni over all genes tested.)
 plot_wilcox_heatmap <- function(dds, wilcox_res, cell_type_label, filename, padj_cutoff = 0.05) {
     wilcox_res$sig_label <- sig_label(wilcox_res$p_val_adj)
     sig_genes <- wilcox_res$gene[wilcox_res$p_val_adj < padj_cutoff]
@@ -85,7 +91,7 @@ plot_wilcox_heatmap <- function(dds, wilcox_res, cell_type_label, filename, padj
     plot_de_heatmap(dds, sig_genes, sig_lookup, paste0(cell_type_label, " (FindMarkers/Wilcoxon sig. genes)"), filename)
 }
 
-# ---- Pseudobulk secondary analysis: genes are the whole candidate panel ----
+# ---- Pseudobulk primary analysis, candidate-panel pass: genes are the whole candidate panel ----
 # (significant or not -- the point of this panel is to show where every
 # pre-specified candidate landed, not just the ones that happened to clear
 # the bar).
