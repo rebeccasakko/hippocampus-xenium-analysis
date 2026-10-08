@@ -9,7 +9,7 @@ Mode: audit (degraded: this session cannot run the code; runs are handed to the 
 Org profile: default
 Reviewer: Holden Harris (holden-harris), with Claude Code        Original author: rebeccasakko
 Line numbers refer to commit: 869af28 (code unchanged by 2a1df70, which added the two review drafts)
-Last completed step: §5 step 2a (B1 parse fix)        Next step: §5 step 2 (baseline: hand-off posted, result pending)        Last updated: 2026-10-07
+Last completed step: §5 step 2a (B1 parse fix); step 3 static part written        Next step: pause 5 (statuses), then §5 step 4; step 2 baseline result pending from the author        Last updated: 2026-10-07
 ```
 
 ## 1. Scope and targets
@@ -81,6 +81,10 @@ row cites 869af28.
 | B2 | `R/process_sample_template.R:11-13` vs `R/run_full_pipeline.R:76-78` | Point-in-polygon treats the whole lasso CSV as one polygon and ignores `Selection`; the area function splits by `Selection` and sums. A file holding more than one selection is joined into one wrong outline by the first and measured correctly by the second, with no check on the number of selections (carry-over from PR #3 review, item V) | mechanical (check) / scientific (if a file has several selections) | medium | open |
 | B3 | `R/classify_atlas_index.R:46` | State refinement `ifelse(StateA1 > StateB1, ...)`: exact ties and cells with no signal from either state panel go to Homeostatic/Precursor; no "cannot tell" state (carry-over item K) | scientific | low | open |
 | B4 | `R/run_full_pipeline.R:118` | `dir.create(output_dir, recursive = TRUE)` is correct, but every writer (`write.csv`, `ggsave`, `png`) overwrites silently, so a second run into a folder of a different run label mixes files; no run label or commit is written into the outputs | mechanical | low | open |
+| B5 | `R/build_cell_count_table.R:17`; `R/run_pseudobulk_de.R:26`; `R/plot_de_heatmap.R:57, 61` | Group membership is inferred from the sample name by regex (`grepl("gii", sample)`, `"^gi-"`) instead of from `group_id`; correct for the six current names, silently wrong for any renamed or added sample, and the `"^gi-"` form also depends on Seurat v5 renaming `_` to `-` (R5) | mechanical | low | open |
+| B6 | `R/classify_atlas_index.R:9, 15` | Panel exclusions (no gene on the Xenium panel; best gene below the 0.5 % floor) are `warning()`s only. In a six-mouse run R defers and truncates them, and nothing writes which panels were scored in which mouse, although composition depends on it (M3; README "Open items" asks exactly this about BAM in `gi_2_d`) | mechanical (write a per-sample panel table) | medium | open |
+| B7 | `R/run_pseudobulk_de.R:22` | `AggregateExpression(..., slot = "counts")`: `slot` is deprecated in Seurat v5 in favour of `layer`; runs with a warning today and may stop in a later Seurat | mechanical | low | open |
+| B8 | `R/run_analyses.R:93-97` | `robustness_table()`: a category present in one run and absent in another gives `NA` in `unfiltered`, `global` or `neartie`, so `flips` and `max_shift` are `NA` and the row sorts to the end without notice | mechanical | low | open |
 
 ### 2.4 Documentation (D)
 
@@ -94,6 +98,7 @@ row cites 869af28.
 | D6 | README "Outputs" ("spatial maps ... in outputs/"); `R/plot_spatial_celltype.R:1` | No per-sample spatial cell-type map exists in `outputs/`, and `plot_spatial_celltype()` is called from nowhere; the only spatial figures are the two driver-gene diagnostics | mechanical | low | open |
 | D7 | README "Cell-type classification" ("Optic-tract immune panels: [TODO: source]") | Six panels have no recorded source (carry-over item W) | mechanical | low | open |
 | D8 | README lines 1-10 | The injury model (CHIMERA), the time point (7 days) and the tissue section plane are not stated anywhere in the repository; they are known only from the author's notes quoted in the PR #3 review | mechanical | low | open |
+| D9 | README "Known limitations" bullet 1; `R/run_wilcox_de.R:22-29`; DE protocol "Results summary" | "The smallest possible two-sided Wilcoxon p-value is 0.1" describes a 3-vs-3 rank test, but composition uses Welch's t-test and the cell-level Wilcoxon has thousands of observations. Separately, `FindMarkers()` adjusts by Bonferroni over all genes, so the Wilcoxon "padj < 0.05" counts (23, 9, 4, 1) are Bonferroni, not BH; no document says so | mechanical | low | open |
 
 ### 2.5 Methods and statistics (M)
 
@@ -110,6 +115,8 @@ Rows here are questions for the author (§8) unless marked otherwise; the arithm
 | M7 | `R/run_pseudobulk_de.R:51-64` | Candidate-panel padj re-adjusts the genome-wide p-values within 3 to 7 pre-specified genes after the genome-wide pass has been read; the pre-specification is documented, but the two passes are reported side by side with no multiplicity accounting across them | scientific | low | open |
 | M8 | `R/run_pseudobulk_de.R:29-31` | DESeq2 defaults: independent filtering, Cook's outlier handling and `rowSums >= 10` on three-vs-three pseudobulks; no dispersion plot or p-value histogram is saved although the protocol cites "flat p-value histograms" as evidence | mechanical (save diagnostics) | low | open |
 | M9 | `R/plot_de_heatmap.R:50-51` | Heatmaps display `log2(normalized counts + 1)` z-scored by gene across six mice; with one mouse driving a gene the scale saturates at +-1.5 (`breaks`), which is fine for display but is not stated in the caption | mechanical (caption) | low | open |
+| M10 | `R/marker_panels.R:3-4, 98-101` with `R/classify_atlas_index.R:41-58` | The Astrocyte and Microglia Homeostatic state panels are the identity panels (protocol "double duty"), so the Active/Homeostatic split compares Gfap/Serpina3n (or Trem2/Cst7/Lpl) against the genes the cells were selected on; "Active" then means "the state genes beat an already-high baseline", which biases the split towards Homeostatic by construction and makes the Active share hard to interpret across regions (README already flags the white-matter astrocyte case) | scientific | medium | open |
+| M11 | `R/run_analyses.R:11-12, 44, 72` | Near-tie categories are those with more than 15 % of cells below the pooled 15th percentile; the pooled share is 15 % by construction, so the rule flags categories noisier than average and its outcome depends on how many categories there are. Stated as a heuristic, never tested; the README's 10th/25th percentile check would exercise it | scientific | low | open |
 
 ### 2.6 Stochasticity (S)
 
