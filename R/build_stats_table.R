@@ -28,7 +28,7 @@ build_stats_table <- function(composition_df) {
         group_by(cell_type) %>%
         summarise(
             p_value = tryCatch(
-                t.test(pct ~ group_id, data = pick(everything())$p.value,
+                t.test(pct ~ group_id, data = pick(everything()))$p.value,
                 error = function(e) NA_real_
             ),
             .groups = "drop"

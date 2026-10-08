@@ -52,7 +52,13 @@ hippocampus_sens_neartie <- run_region_pipeline(
   run_label = "sens_neartie",
   prefilter_objects = hippocampus_results$sample_objects_prefilter)
 
-# ---- Optic tract (16 panels; redrawn lassos, 2026-10-05) ----
+# ---- Optic tract (15 panels; redrawn lassos, 2026-10-05) ----
+# Neutrophil excluded 2026-10-08 after driver-gene diagnostics (see
+# Diagnostics section below). The earlier 16-panel runs are kept for
+# comparison in outputs/optic_tract_newlasso_*_withNeut/.
+# 15-panel runs: pooled 15th-percentile margin = 0.0257; near-tie (% below):
+# Choroid plexus 54.5, GABAergic interneuron 27.4, Pericyte/vascular SMC 22.0,
+# B cell 21.7, Peripheral macrophage 19.3 (BAM 14.5 = borderline, not included).
 
 optic_tract_results <- run_region_pipeline(
   sample_base, optic_tract_lassos, "Optic Tract",
@@ -69,8 +75,8 @@ optic_tract_sens_global <- run_region_pipeline(
   run_label = "sens_global",
   prefilter_objects = optic_tract_results$sample_objects_prefilter)
 
-optic_tract_near_tie_cats <- c("Choroid plexus", "Neutrophil", "GABAergic interneuron",
-                               "Peripheral macrophage", "B cell", "BAM")
+optic_tract_near_tie_cats <- c("Choroid plexus", "GABAergic interneuron", "Pericyte/vascular SMC",
+                               "B cell", "Peripheral macrophage")
 
 optic_tract_sens_neartie <- run_region_pipeline(
   sample_base, optic_tract_lassos, "Optic Tract",
@@ -128,3 +134,29 @@ write.csv(driver_check(hc_objs, "Ependymal/ciliated", c("Foxj1", "Pifo", "Dnah12
 write.csv(runner_up_summary(hc_objs, "Ependymal/ciliated"),
           "outputs/hippocampus_ependymal_runner_up.csv", row.names = FALSE)
 plot_category_spatial(hc_objs, "Ependymal/ciliated", "outputs/hippocampus_ependymal_spatial.png")
+
+# ---- Diagnostics: single-gene driver checks, optic tract (2026-10-08) ----
+# Neutrophil: Csf3r alone (96-100% of calls in 5/6 mice; Ly6g 0% in all
+#   mice), median margin 0.21, ~half myeloid runner-up, scattered evenly;
+#   Csf3r loads with microglia/macrophage genes on PC1 -> Csf3r-positive
+#   myeloid cells, not neutrophils. Excluded from the optic tract panel.
+# Choroid plexus: Folr1 + Otx2 (Kl low), median margin 0.36, mixed
+#   runner-ups; cluster at one tip of the lasso + scattered calls -> mixed
+#   real and noisy signal. Kept; reported as not robust.
+# Uses the 16-panel run (before Neutrophil was excluded):
+ot_objs <- lapply(c("gi_1_b", "gi_2_d", "gi_3_f", "gii_1_a", "gii_2_c", "gii_3_e"), function(s)
+  readRDS(file.path("outputs/optic_tract_newlasso_unfiltered_withNeut", paste0(s, "_classified_prefilter.rds"))))
+names(ot_objs) <- c("gi_1_b", "gi_2_d", "gi_3_f", "gii_1_a", "gii_2_c", "gii_3_e")
+ctx <- "Oligodendrocyte (Mature)"
+
+write.csv(driver_check(ot_objs, "Neutrophil", c("Ly6g", "Csf3r", "Cxcr2")),
+          "outputs/optic_tract_neutrophil_gene_detection.csv", row.names = FALSE)
+write.csv(runner_up_summary(ot_objs, "Neutrophil"),
+          "outputs/optic_tract_neutrophil_runner_up.csv", row.names = FALSE)
+plot_category_spatial(ot_objs, "Neutrophil", "outputs/optic_tract_neutrophil_spatial.png", context = ctx)
+
+write.csv(driver_check(ot_objs, "Choroid plexus", c("Folr1", "Kl", "Otx2")),
+          "outputs/optic_tract_choroid_plexus_gene_detection.csv", row.names = FALSE)
+write.csv(runner_up_summary(ot_objs, "Choroid plexus"),
+          "outputs/optic_tract_choroid_plexus_runner_up.csv", row.names = FALSE)
+plot_category_spatial(ot_objs, "Choroid plexus", "outputs/optic_tract_choroid_plexus_spatial.png", context = ctx)
