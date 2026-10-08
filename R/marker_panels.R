@@ -81,6 +81,12 @@ optic_tract_markers[["Hippocampal pyramidal"]] <- NULL
 optic_tract_markers[["Dentate gyrus granule"]] <- NULL
 optic_tract_markers[["RGC (sanity check)"]] <- NULL
 optic_tract_markers[["Ependymal/ciliated"]] <- NULL
+# Neutrophil excluded from optic tract (2026-10-08): calls were Csf3r-driven
+# (96-100% of calls in 5/6 mice; Ly6g 0% in all mice), median margin 0.21,
+# about half had a myeloid runner-up (macrophage, dendritic cell, microglia),
+# and calls were scattered evenly through the tract -> Csf3r-positive myeloid
+# cells, not neutrophils. Evidence: outputs/optic_tract_neutrophil_*.
+optic_tract_markers[["Neutrophil"]] <- NULL
 
 # Hippocampus uses the 13 original panels: drop the optic-tract-only panels
 hippocampus_markers <- atlas_index_markers
