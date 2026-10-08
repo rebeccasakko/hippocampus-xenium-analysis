@@ -2,11 +2,16 @@
 
 ## 0. How to read this document
 
-Written last (Phase 9). Until then: this is the plain-language guide to running and maintaining
-the pipeline; the science review (`docs/review/science-review.md`) says what it does and why; the
-findings log (`docs/review/issue6-audit-repo-log.md`) is the audit record and holds every
-decision. Line numbers refer to commit 869af28. Last updated 7 Oct 2026
-(Phase 2 draft: §1 and §2 only).
+This is the plain-language guide for an analyst who has never seen the code and needs to run it,
+trust it and maintain it. Each technical term is defined where it first appears and collected in
+the glossary (§10.4). The three documents divide the work: the science review
+(`docs/review/science-review.md`) says what the pipeline does and why, in research-article form;
+this workflow review says how to run and maintain it; the findings log
+(`docs/review/issue6-audit-repo-log.md`) is the audit record, with every finding, decision and
+commit. Sections 1 to 8 describe the pipeline as it was found at commit 869af28 (line numbers
+refer to that commit) with notes where the audit branch changed something; §2.2 and §2.3 also
+describe the as-left configuration and entry point; §9 holds the run evidence, as-found (pending
+the author's baseline) and as-left (pending Phase 8). Last updated 7 Oct 2026.
 
 ## 1. The pipeline in one page
 
@@ -82,9 +87,22 @@ near-tie category lists (`R/run_analyses.R:39, 44, 50, 67, 72, 79`); pseudobulk 
 (`R/run_pseudobulk_de.R:17`); Wilcoxon `logfc.threshold = 0.25`, `min.pct = 0.1`
 (`R/run_wilcox_de.R:27-28`); 30 principal components (`R/run_full_pipeline.R:209-210`).
 
-The audit's fix design (findings log §4) proposes one gitignored `config.local.R` read after
-repo-relative defaults, with the author's paths above kept as commented examples so their layout
-keeps working.
+**As left (commit 26d5d98 and later).** The literals above are gone. `R/run_full_pipeline.R`
+sets repo-relative defaults in a SETTINGS block, sources `config.local.R` (gitignored) if it
+exists with the message "Applied local overrides from config.local.R", and builds `sample_base`
+from them; `config.local.example.R` documents every key with the author's paths as commented
+examples, verified to evaluate to vectors identical to the removed literals.
+
+| Key | Default | Purpose | When to change it |
+|---|---|---|---|
+| `dir.data` | `file.path(dir.repo, "data")` | Folder for the inputs that cannot ship | When the data sits elsewhere and the per-input keys follow the default layout |
+| `xenium_dirs` | `file.path(dir.data, "xenium", "0071470_<sample>")`, named by sample id | The six Xenium bundles | Always, unless the bundles are copied under `data/xenium/` |
+| `hippocampus_lassos` | `file.path(dir.data, "lassos", "hippocampus", "hippocampus_<sample>.csv")` | Hippocampus lasso files | Same |
+| `optic_tract_lassos` | `file.path(dir.data, "lassos", "optic_tract", "<GI-1..GII-3>_coordinates.csv")` | Optic tract lasso files | Same |
+| `dir.out` | `file.path(dir.repo, "outputs")` | Where runs write | Only to redirect the whole output tree |
+
+The author's `config.local.R` is the three-key block in the pull request description; nothing else
+changes for them.
 
 ### 2.3 Entry point and run modes
 
@@ -124,11 +142,38 @@ then its cells read "pending: run on the author's machine".
 
 ### 2.5 What a first run prints
 
-Today: nothing before the slow work. With the data missing, the first message is R's own error
-from `LoadXenium()` inside the first sample's stage 1, after the packages have loaded; with a lasso
-file missing, `read.csv()`'s "cannot open file" after that sample's bundle has been loaded and
-normalised. The audit proposes an input-check table (findings log §4) that reports every bundle
-and lasso file as OK or MISSING before stage 1.
+As found: nothing before the slow work. With the data missing, the first message was R's own
+error from `LoadXenium()` inside the first sample's stage 1, after the packages had loaded; with a
+lasso file missing, `read.csv()`'s "cannot open file" after that sample's bundle had been loaded
+and normalised.
+
+As left: `source("R/run_full_pipeline.R")` first checks the working directory (wrong folder:
+"Set the working directory to the repository root - open hippocampus-xenium-analysis.Rproj in
+RStudio, or setwd() there. Currently: <path>"), then the packages (missing: "Missing R
+package(s): Seurat, DESeq2" followed by the `install.packages()` and `BiocManager::install()`
+lines), then says whether a local config was applied. The first `run_region_pipeline()` call
+prints the input check before any slow work; verified on a temporary tree on the analyst's
+machine (2026-10-07):
+
+```
+Input check
+----------------------------------------------------------------------------------------------------
+  input                      stage   need     status  path
+  xenium_gi_1_b              0,1     required OK      .../xtest/xenium/0071470_gi_1_b
+  xenium_gii_3_e             0,1     required MISSING .../xtest/xenium/0071470_gii_3_e
+  lasso_hippocampus_gi_1_b   0,1,1c  required OK      .../xtest/lassos/hippocampus/hippocampus_gi_1_b.csv
+  lasso_hippocampus_gii_3_e  0,1,1c  required MISSING .../xtest/lassos/hippocampus/hippocampus_gii_3_e.csv
+----------------------------------------------------------------------------------------------------
+
+Missing input(s):
+  xenium_gii_3_e             Xenium output bundle for gii_3_e (10x run 0071470; several GB). Unpublished lab data: ...
+  lasso_hippocampus_gii_3_e  Xenium Explorer selection export (CSV, ...) for gii_3_e, hippocampus. Request from the author; ...
+  See README.md > Getting the data, and config.local.example.R for the path overrides.
+Error: Missing required input(s): xenium_gii_3_e, lasso_hippocampus_gii_3_e.
+```
+
+`MISSING` is a stop, not a flag: the run does not continue. A sensitivity run that reuses loaded
+objects checks only the lasso files.
 
 ## 3. Data inputs
 
