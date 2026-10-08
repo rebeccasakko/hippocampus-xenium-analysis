@@ -9,7 +9,7 @@ Mode: audit (degraded: this session cannot run the code; runs are handed to the 
 Org profile: default
 Reviewer: Holden Harris (holden-harris), with Claude Code        Original author: rebeccasakko
 Line numbers refer to commit: 869af28 (code unchanged by 2a1df70, which added the two review drafts)
-Last completed step: §5 step 8 (documentation)        Next step: §5 step 11 drafts (README, CLAUDE.md, PR description); steps 9-10 wait for the author; step 2 baseline result pending from the author        Last updated: 2026-10-07
+Last completed step: §5 step 11 drafts (README, CLAUDE.md, PR description)        Next step: step 9 (record the baseline when the author posts it on PR #7), then step 10 (Phase 8 runs), then the pre-ready check and pause 10; step 2 baseline result pending from the author        Last updated: 2026-10-07
 ```
 
 ## 1. Scope and targets
@@ -327,7 +327,7 @@ any regenerated outputs are committed; pause 9 before any `git rm --cached` (non
 - [x] 8. Documentation fixes (`d839f59`) in protocols, comments and README. (docs; D1-D6, D9, M9, S1)
 - [ ] 9. Baseline result recorded when the author's log arrives: workflow review §9.1 result line, stage table, comparison table; T1 measured. (record)
 - [ ] 10. Phase 8 verification on the author's machine and, if the data can be placed, on the analyst's: fresh clone without data; fresh clone with data and `config.local.R`; interactive run; fingerprints compared; convention checks. (record) **Pause 8 if any tracked output is to be regenerated and committed.**
-- [ ] 11. README and `CLAUDE.md` sync from the review documents; PR description; pre-ready check; §11 closing summary. (docs) **Pause 10.**
+- [ ] 11. README and `CLAUDE.md` sync and PR description done in `b67439a` (docs); pre-ready check and §11 closing summary wait for steps 9-10. **Pause 10.**
 
 ## 6. Change log
 
@@ -342,6 +342,7 @@ any regenerated outputs are committed; pause 9 before any `git rm --cached` (non
 | `26d5d98` | code | P1-P6, E3, E4 | 21/21 files parse; anchor stop from a temp dir; package-check stop at the root; OK/MISSING table and stop on a temp tree; override test; author examples identical() to the removed literals (commit body) | findings log §5, §6; workflow review §2 (step 8) |
 | `cc60d9f` | code | R1, R2, R3, R5, R6, R7, B2, B4, B5, B6, B7, B8, M8, T1 (lines), T2 | robustness table byte-identical from committed tables; mocks for near-tie, filter, cell-count table; git head equals git rev-parse; 21/21 parse (commit body) | findings log §5, §6 |
 | `d839f59` | docs | D1, D2, D3, D5, D6, D9, M9, S1 | prose only; 21/21 files parse | protocols, README, comments in four R files |
+| `b67439a` | docs | none (README sync; D6, D7 pointers) | convention checks: machine-path grep hits only config.local.example.R; windows( none; tracked-but-ignored none | README, CLAUDE.md, workflow review §0, §2.2, §2.5 |
 
 ## 7. Decisions log
 
