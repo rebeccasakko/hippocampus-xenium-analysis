@@ -9,7 +9,7 @@ Mode: audit (degraded: this session cannot run the code; runs are handed to the 
 Org profile: default
 Reviewer: Holden Harris (holden-harris), with Claude Code        Original author: rebeccasakko
 Line numbers refer to commit: 869af28 (code unchanged by 2a1df70, which added the two review drafts)
-Last completed step: §5 step 4 (pause 5 and fix design)        Next step: §5 step 5 (portability code), then pause 7; step 2 baseline result pending from the author        Last updated: 2026-10-07
+Last completed step: §5 step 5 (portability code)        Next step: pause 7, then §5 step 6; step 2 baseline result pending from the author        Last updated: 2026-10-07
 ```
 
 ## 1. Scope and targets
@@ -321,7 +321,7 @@ any regenerated outputs are committed; pause 9 before any `git rm --cached` (non
 - [ ] 2. Baseline: hand-off block posted on PR #7 for the author; record the result in the workflow review §9.1 when it arrives. (record)
 - [x] 3. Phase 5 static review: registers completed; workflow review §3-§8; science review §5-§7. (record; `9dfcd45`)
 - [x] 4. Pause 5 statuses, §4 fix design, this plan, decisions 5-10, §8 entries, sub-issues #8 and #9 opened and linked under #6. (record)
-- [ ] 5. Portability: track `.Rproj`; root anchor, SETTINGS block and `config.local.R` sourcing in `R/run_full_pipeline.R`; `R/_setup.R`; `config.local.example.R`; `setwd()` removed; `tidyverse` removed; prints guarded; old lassos to the example; `.gitignore` `data/`. (code; P1-P6, E3, E4) **Pause 7 after this step.**
+- [x] 5. Portability (`26d5d98`): track `.Rproj`; root anchor, SETTINGS block and `config.local.R` sourcing in `R/run_full_pipeline.R`; `R/_setup.R`; `config.local.example.R`; `setwd()` removed; `tidyverse` removed; prints guarded; old lassos to the example; `.gitignore` `data/`. (code; P1-P6, E3, E4) **Pause 7 after this step.**
 - [ ] 6. Provenance outputs: composition, DE, depth and panel-status tables; `run_info.txt` with stage timings; `session_info.txt`; DESeq2 diagnostics. (code; R1, R2, R3, R5, B4, B6, M8, T1)
 - [ ] 7. Robustness: group from metadata; `layer=`; NA-safe flips; lasso selection warning; checkpoint sidecar; near-tie list computed and compared; skip toggle. (code; B2, B5, B7, B8, R6, R7, T2)
 - [ ] 8. Documentation fixes in protocols, comments and README. (docs; D1-D6, D9, M9, S1)
@@ -338,7 +338,8 @@ any regenerated outputs are committed; pause 9 before any `git rm --cached` (non
 | `d17429b` | code | B1 | 19/19 files parse; stats table recomputed from the committed composition table (see §3) | findings log §2.3, §5, §7 |
 | `d767858` | record | none | none | findings log §0, §3 hand-off, §5, §6, §7 (decision 4), §10; workflow review §9.1 baseline notes |
 | `9dfcd45` | record | none | static evidence in §3 (md5 of DE heatmaps; robustness and stats tables recomputed; DE tables recounted) | findings log §2 (B5-B8, D9, M10, M11); workflow review §3-§8; science review §5-§7 |
-| pending | record | none | none | findings log §2 statuses, §4, §5, §7 (decisions 5-10), §8, §10 (sub-issues #8, #9) |
+| `72a2a34` | record | none | none | findings log §2 statuses, §4, §5, §7 (decisions 5-10), §8, §10 (sub-issues #8, #9) |
+| `26d5d98` | code | P1-P6, E3, E4 | 21/21 files parse; anchor stop from a temp dir; package-check stop at the root; OK/MISSING table and stop on a temp tree; override test; author examples identical() to the removed literals (commit body) | findings log §5, §6; workflow review §2 (step 8) |
 
 ## 7. Decisions log
 
