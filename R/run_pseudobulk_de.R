@@ -1,12 +1,12 @@
 # ============================================================
-# Pseudobulk DESeq2 differential expression (secondary analysis)
+# Pseudobulk DESeq2 differential expression (PRIMARY analysis since 2026-10-07)
 #
 # Mouse-level replication (n = 3 per group): all cells of one cell type,
 # from one mouse, are aggregated into a single expression profile before
 # testing. This is the conservative, standard-practice unit of biological
 # replication -- see protocols/differential_expression_protocol.md for
 # the full rationale and how this compares to the Wilcoxon/FindMarkers
-# primary analysis in R/run_wilcox_de.R.
+# secondary (exploratory) analysis in R/run_wilcox_de.R.
 # ============================================================
 
 # Builds the pseudobulk DESeqDataSet for one cell type from the merged,
@@ -44,9 +44,12 @@ build_pseudobulk_dds <- function(xenium, cell_type_filter, identity_col = "atlas
 }
 
 # Full-panel results table (every gene passing the pseudobulk count
-# filter), BH-corrected across the whole panel. This is what the
-# genome-wide null result (zero significant genes, every cell type) was
-# established from -- see the protocol doc for that diagnosis.
+# filter), BH-corrected across the whole panel. This is the genome-wide
+# pass; in the 12-panel hippocampus run it finds one gene (Ddit4, dentate
+# gyrus granule) and nothing in the other three cell types -- see the
+# protocol doc. Independent filtering and Cook's outlier flagging are
+# DESeq2 defaults; with three replicates per group a flagged gene gets
+# pvalue/padj NA rather than a replaced count.
 get_pseudobulk_results <- function(dds) {
     results(dds, contrast = c("group", "gi", "gii")) %>%
         as.data.frame() %>%

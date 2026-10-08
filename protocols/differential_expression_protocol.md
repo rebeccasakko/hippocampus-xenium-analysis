@@ -19,11 +19,17 @@ All cells of one cell type, from one mouse, are aggregated into a single
 expression profile before testing (`Seurat::AggregateExpression()`). The
 real sample size the statistics see is n = 3 vs. n = 3 -- the standard,
 defensible unit of replication. A genome-wide test (every gene passing
-`rowSums(counts) >= 10`) returned **zero significant genes in every cell
-type** -- confirmed to be a true null (flat p-value histograms, not a
-correction artifact) and confirmed to hold even when isolating the Active
-astrocyte subpopulation specifically (ruling out dilution-by-pooling as an
-explanation).
+`rowSums(counts) >= 10`, BH across all genes tested) returned **one
+significant gene in the 12-panel hippocampus run: Ddit4 in dentate gyrus
+granule cells (padj = 0.004, higher in TBI)** and none in astrocytes,
+microglia or GABAergic interneurons (see "Results summary" below and
+`outputs/hippocampus_unfiltered/de/*_res_full.csv`). Earlier runs had
+returned zero genes everywhere; the null in the other three cell types was
+confirmed as a true null (flat p-value histograms, not a correction
+artifact) and confirmed to hold even when isolating the Active astrocyte
+subpopulation specifically (ruling out dilution-by-pooling as an
+explanation). Since the audit (issue #6) every run saves its p-value
+histograms and dispersion plots in `outputs/<run>/de/`.
 
 Because genome-wide testing is underpowered at this sample size, a second
 pass restricts to a small, pre-specified, literature-justified candidate
@@ -45,7 +51,10 @@ aggregation, no candidate-list restriction, run across every gene passing
 Seurat's own default thresholds (`logfc.threshold = 0.25`, `min.pct =
 0.1`, matching the paper's method exactly). Effective sample size balloons
 into the tens of thousands of cells, even though it is still only 3
-animals per group biologically.
+animals per group biologically. Note that `FindMarkers()` adjusts p-values
+by **Bonferroni** over all genes tested (its `p_val_adj` column), so the
+Wilcoxon "padj < 0.05" counts below are Bonferroni-adjusted, not BH; the
+pseudobulk columns are BH-adjusted.
 
 **Strength:** far more sensitive; surfaces genes no one would have thought
 to pre-specify (e.g. Ddit4 recurring across several cell types); doesn't
@@ -62,7 +71,9 @@ group. More hits does not mean more true positives.
 
 Both methods share one display convention so their figures are directly
 comparable: z-scored (`log2(normalized counts + 1)`, then per-gene
-z-score), one column per MOUSE (never per cell, even for
+z-score across the six mice, displayed on a colour scale clipped at
+-1.5 to +1.5, so a gene driven by one mouse saturates the scale), one
+column per MOUSE (never per cell, even for
 Wilcoxon-selected genes -- gene selection can come from the cell-level
 test, but display always happens at a level a person can read and that
 means something biologically), gi/gii annotation bar, free (unforced)

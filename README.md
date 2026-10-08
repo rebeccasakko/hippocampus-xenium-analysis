@@ -94,15 +94,22 @@ unit (n = 3 per group).
   group, region, run, lasso_area_um2, cells_per_1000um2. pct_pass_qc20_10 is
   the share of cells (already passing nCount >= 10 and nFeature >= 5) that
   would also pass a stricter nCount >= 20 and nFeature >= 10 cutoff.
-- Composition tables and bar charts, UMAP, spatial maps and DE heatmaps in
-  outputs/.
+- Composition tables and bar charts, UMAP figures and DE heatmaps and tables
+  in outputs/ (see "Outputs" below for the full list). Per-sample spatial
+  cell-type maps are not written by the pipeline; `plot_spatial_celltype()`
+  (R/plot_spatial_celltype.R) is an interactive helper for drawing one. The
+  only spatial figures in outputs/ are the two driver-gene diagnostics.
 - Folders ending in _withCP hold the earlier 13-panel hippocampus runs
   (before Choroid plexus was excluded), kept for comparison.
 
 ## Known limitations
 
-- n = 3 per group: with 3 versus 3, the smallest possible two-sided Wilcoxon
-  p-value is 0.1; composition and DE results are exploratory.
+- n = 3 per group: every mouse-level test (Welch t-test on composition,
+  pseudobulk DESeq2) has very little power with three mice per group, and
+  the cell-level Wilcoxon test treats correlated cells as independent;
+  composition and DE results are exploratory. The Wilcoxon `p_val_adj` from
+  Seurat `FindMarkers()` is Bonferroni-adjusted over all genes tested; the
+  pseudobulk and composition adjustments are Benjamini-Hochberg.
 - The smallest Optic Tract lasso (gii_3_e) has 156 cells; rare categories in
   that sample are unreliable.
 - Astrocyte Active/Homeostatic (Gfap, Serpina3n) is compromised in white

@@ -2,9 +2,10 @@
 # Candidate gene panels -- differential expression (gi vs. gii)
 #
 # Pre-specified, literature-justified gene lists used ONLY for the
-# pseudobulk DESeq2 secondary analysis (see protocols/differential_
-# expression_protocol.md). NOT used by the Wilcoxon/FindMarkers primary
-# analysis, which tests the full gene panel with no restriction.
+# candidate-panel pass of the pseudobulk DESeq2 analysis, which is the
+# PRIMARY DE analysis (see protocols/differential_expression_protocol.md).
+# NOT used by the Wilcoxon/FindMarkers secondary (exploratory) analysis,
+# which tests the full gene panel with no restriction.
 #
 # dg and gaba panels were pulled from the literature specifically for
 # this project (see citations below); astro and microglia panels predate

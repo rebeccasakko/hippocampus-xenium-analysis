@@ -286,6 +286,10 @@ run_region_pipeline <- function(sample_base, lasso_map, region_label, de_cell_ty
     message("\nskip_embedding_and_de = TRUE: stages 4 (UMAP) and 5 (DE) skipped for this run.")
   } else {
   # ---- Stage 4: UMAP + microglia state QC check ----
+  # Randomness: no set.seed() anywhere in this repository; RunPCA() and
+  # RunUMAP() use Seurat's default seed.use = 42, AddModuleScore() (stage 1)
+  # its default seed = 1, so results repeat for a given Seurat/uwot version.
+  # UMAP coordinates can still differ between package versions (audit S1).
   combined <- FindVariableFeatures(combined)
   combined <- ScaleData(combined)
   combined <- RunPCA(combined, npcs = 30)

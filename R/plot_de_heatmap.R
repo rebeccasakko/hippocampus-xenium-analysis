@@ -82,7 +82,8 @@ plot_de_heatmap <- function(dds, genes, sig_lookup, cell_type_label, filename) {
     invisible(p)
 }
 
-# ---- Wilcoxon primary analysis: genes are whatever cleared padj_cutoff ----
+# ---- Wilcoxon secondary (exploratory) analysis: genes are whatever cleared padj_cutoff ----
+# (p_val_adj from FindMarkers() is Bonferroni over all genes tested.)
 plot_wilcox_heatmap <- function(dds, wilcox_res, cell_type_label, filename, padj_cutoff = 0.05) {
     wilcox_res$sig_label <- sig_label(wilcox_res$p_val_adj)
     sig_genes <- wilcox_res$gene[wilcox_res$p_val_adj < padj_cutoff]
@@ -90,7 +91,7 @@ plot_wilcox_heatmap <- function(dds, wilcox_res, cell_type_label, filename, padj
     plot_de_heatmap(dds, sig_genes, sig_lookup, paste0(cell_type_label, " (FindMarkers/Wilcoxon sig. genes)"), filename)
 }
 
-# ---- Pseudobulk secondary analysis: genes are the whole candidate panel ----
+# ---- Pseudobulk primary analysis, candidate-panel pass: genes are the whole candidate panel ----
 # (significant or not -- the point of this panel is to show where every
 # pre-specified candidate landed, not just the ones that happened to clear
 # the bar).
