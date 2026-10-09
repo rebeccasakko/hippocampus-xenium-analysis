@@ -24,11 +24,11 @@ Mature/Precursor) using state-specific panels.
   literature-based curated deviations. Optic-tract immune panels:
   [TODO: source].
 - Hippocampus uses 12 candidate panels: the 13 original panels minus Choroid
-  plexus (excluded 2026-10-06 after driver-gene diagnostics). The Optic Tract uses 16: the 13
+  plexus (excluded 2026-10-06 after driver-gene diagnostics). The Optic Tract uses 15: the 13
   plus six immune panels (Peripheral macrophage, T cell, Neutrophil,
-  NK cell, B cell, Dendritic cell), minus four hippocampus- or
-  tract-inappropriate panels (Hippocampal pyramidal, Dentate gyrus granule,
-  Ependymal/ciliated, RGC). Reasons for each exclusion (single-gene driver
+  NK cell, B cell, Dendritic cell) and an RGC panel, minus five panels
+  (Hippocampal pyramidal, Dentate gyrus granule, Ependymal/ciliated, RGC,
+  Neutrophil). Reasons for each exclusion (single-gene driver
   false positives) are documented in R/marker_panels.R and
   protocols/classification_protocol.md.
 - Detection floor: a panel is excluded from scoring in a sample if its best
@@ -55,9 +55,8 @@ Optic Tract. The primary analysis applies no confidence filter. Two
 sensitivity analyses reassign cells below the pooled 15th-percentile
 classification margin to Unclassified: (1) across all categories
 (sens_global), and (2) only within categories where more than 15% of cells
-fell below that threshold in the unfiltered run (sens_neartie: Choroid
-plexus, Neutrophil, GABAergic interneuron, Peripheral macrophage, B cell,
-BAM). The threshold and category list were derived from the margin
+fell below that threshold in the unfiltered run (sens_neartie: Choroid plexus, GABAergic interneuron, Pericyte/vascular SMC,
+B cell, Peripheral macrophage; threshold 0.0257 with the 15-panel set). The threshold and category list were derived from the margin
 distribution pooled across all six samples; group labels were not used to
 select either. A finding is considered robust to near-tie handling if the
 direction of the TBI-versus-sham difference is unchanged across all three
@@ -98,6 +97,8 @@ unit (n = 3 per group).
   outputs/.
 - Folders ending in _withCP hold the earlier 13-panel hippocampus runs
   (before Choroid plexus was excluded), kept for comparison.
+- Folders ending in _withNeut hold the earlier 16-panel optic tract runs
+  (before Neutrophil was excluded), kept for comparison.
 
 ## Known limitations
 
@@ -110,17 +111,20 @@ unit (n = 3 per group).
   Serpina3n is largely oligodendrocyte-expressed in white matter. The
   buckets are best read as marker-high versus marker-low. The combined
   astrocyte total is reported alongside the split.
-- Sensitivity to near-tie handling (Optic Tract; see
-  outputs/optic_tract_near_tie_sensitivity.csv): the TBI-minus-sham difference
-  in composition changed sign when near-tie cells were reassigned to
-  Unclassified for Unclassified, Neutrophil, B cell, Choroid plexus and
-  Peripheral macrophage (shifts of 2.5 to 6.7 percentage points). Group
-  differences in these five categories are not robust and are not
-  interpreted. All other categories kept their direction, and the largest
-  (Mature oligodendrocyte, Homeostatic microglia, Homeostatic astrocyte,
-  Precursor oligodendrocyte, Endothelial) were unchanged between runs.
-  (Pericyte/vascular SMC changed sign in the all-category run by 0.2
-  percentage points, which is negligible.)
+- Sensitivity to near-tie handling (Optic Tract, 15 panels; see
+  outputs/optic_tract_near_tie_sensitivity.csv): the TBI-minus-sham
+  difference changed sign for B cell and Unclassified. Peripheral
+  macrophage kept its direction, but its difference grew from 0.60 to 3.05
+  percentage points, so its size is not robust; Choroid plexus kept its
+  direction but halved (-1.19 to -0.53). Mature oligodendrocyte,
+  Homeostatic microglia, Homeostatic astrocyte, Precursor oligodendrocyte
+  and Endothelial were essentially unchanged across all three runs. Before
+  Neutrophil was excluded (16 panels; outputs/
+  optic_tract_near_tie_sensitivity_withNeut.csv), five categories changed sign.
+- Optic tract Neutrophil calls were Csf3r-driven (Ly6g 0% in all mice) and
+  the panel was excluded; optic tract Choroid plexus calls are mixed (a
+  cluster at one end of the lasso plus scattered low-confidence calls) and
+  are kept but reported as not robust.
 - Sensitivity to near-tie handling (Hippocampus, 12 panels; see
   outputs/hippocampus_near_tie_sensitivity.csv): Ependymal/ciliated and
   Fibroblast/meningeal changed sign, and the Pericyte/vascular SMC
@@ -140,8 +144,6 @@ unit (n = 3 per group).
 
 ## Open items
 
-- Optic Tract: check Neutrophil (Csf3r) and Choroid plexus for single-gene
-  drivers, as was done for hippocampal Choroid plexus (R/check_driver_genes.R).
 - Optic Tract: compare per-sample transcript depth between groups.
 - UMAP coloured by sample, to check whether any island comes from a single
   mouse.
