@@ -197,7 +197,7 @@ run_region_pipeline <- function(sample_base, lasso_map, region_label, de_cell_ty
   group_colors <- c(gi = "#5BC8C2", gii = "#F2A8A0")
   composition_plot <- plot_composition_barchart(
     composition$summary_df, group_colors,
-    title = paste0(region_label, " cell-type composition: gii vs gi"),
+    title = paste0(region_label, " cell-type composition: TBI vs sham"),
     composition_df = composition$composition_df, show_points = TRUE)
   print(composition_plot)
   ggsave(file.path(output_dir, "composition_barchart.png"), composition_plot,
