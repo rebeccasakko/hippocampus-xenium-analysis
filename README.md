@@ -63,7 +63,7 @@ direction of the TBI-versus-sham difference is unchanged across all three
 runs; the size of any change is reported.
 
 Hippocampus. Earlier versions applied a fixed margin > 1 rule to BAM only.
-This was replaced (2026-10-06) by the same design as the Optic Tract: an
+This was replaced by the same design as the Optic Tract (rebuilt 2026-10-15): an
 unfiltered primary analysis plus two sensitivity runs, using the region's own
 pooled 15th-percentile margin (0.1745 with the 12-panel set; sens_neartie:
 BAM, Ependymal/ciliated, Microglia (Active)). A fixed threshold is not
@@ -83,7 +83,7 @@ protocols/differential_expression_protocol.md.
 
 Composition differences are tested per category with Welch's t-test and
 Benjamini-Hochberg correction (R/build_stats_table.R), with the sample as the
-unit (n = 3 per group).
+unit (n = 3 per group). In the hippocampus, no category differed after correction (smallest adjusted p = 0.74).
 
 ## Outputs
 
@@ -136,6 +136,7 @@ unit (n = 3 per group).
 - Hippocampal Ependymal/ciliated calls are mixed: mostly Foxj1-driven, with
   some calls lining the ventricular edge of the lasso. The category is kept
   and reported as not robust.
+- Hippocampal BAM calls are mostly marker-free: in the unfiltered run, only 16 to 31% of BAM-called cells (100% in gii_2_c) had at least one Mrc1, F13a1 or Cd163 transcript. BAM markers are detected in under 1% of cells in every sample, so the unfiltered BAM difference reflects the number of marker-free calls, not BAM abundance. Marker-positive BAM cells were about 1% of cells in every mouse.
 - Marker spillover from neighbouring cells (segmentation) can contribute to
   signal for some genes.
 - Sample quality: in the hippocampus, median transcripts per cell were
@@ -145,10 +146,7 @@ unit (n = 3 per group).
 ## Open items
 
 - Optic Tract: compare per-sample transcript depth between groups.
-- UMAP coloured by sample, to check whether any island comes from a single
-  mouse.
-- gi_2_d BAM: 0 cells under the detection floor in an earlier run, 264 in
-  the current run; confirm which cells the 0.5% floor is calculated on.
+- BAM: consider reporting marker-positive BAM cells as a diagnostic.
 - Robustness to the percentile choice (10th and 25th, alongside the 15th).
 - Optic Tract composition bar charts: redraw with the corrected plotting code
   (fixed 2026-10-07) when the optic tract runs are next repeated.

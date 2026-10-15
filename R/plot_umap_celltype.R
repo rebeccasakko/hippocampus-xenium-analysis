@@ -1,11 +1,12 @@
-plot_umap_celltype <-
-function(xenium, group_levels = c("gii", "gi"), pt_size = 0.3) {
-
-    xenium$group_id <- factor(xenium$group_id, levels = group_levels)
-
-    DimPlot(xenium, reduction = "umap", group.by = "cell_type",
-            split.by = "group_id", pt.size = pt_size) +
-        ggtitle("cell_type")
+plot_umap_celltype <- function(xenium, group_levels = c("gii", "gi"), pt_size = 0.1) {
+  
+  group_labels <- c(gii = "Sham", gi = "TBI")
+  xenium$group_id <- factor(xenium$group_id, levels = group_levels,
+                            labels = group_labels[group_levels])
+  
+  DimPlot(xenium, reduction = "umap", group.by = "cell_type",
+          split.by = "group_id", pt.size = pt_size) +
+    ggtitle("cell_type")
 }
 
 # Highlights Microglia (Active) and Microglia (Homeostatic) against every

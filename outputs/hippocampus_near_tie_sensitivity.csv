@@ -1,16 +1,16 @@
-"cell_type","unfiltered","global","neartie","flips","max_shift"
-"Ependymal/ciliated",-1.01,0.38,0.38,TRUE,1.39
-"BAM",1.29,0.08,0.08,FALSE,1.21
-"Unclassified",-0.07,-0.86,-0.15,FALSE,0.79
-"Fibroblast/meningeal",-0.35,0.12,-0.35,TRUE,0.47
-"Dentate gyrus granule",-0.79,-0.38,-0.79,FALSE,0.41
-"Hippocampal pyramidal",-1.17,-0.85,-1.17,FALSE,0.32
-"Pericyte/vascular SMC",0.3,-0.01,0.3,TRUE,0.31
-"GABAergic interneuron",-0.29,-0.44,-0.29,FALSE,0.15
-"Astrocyte (Homeostatic)",0.84,0.7,0.84,FALSE,0.14
-"Endothelial",0.46,0.56,0.46,FALSE,0.1
-"Microglia (Active)",0.22,0.12,0.12,FALSE,0.1
-"Astrocyte (Active)",-0.06,-0.14,-0.06,FALSE,0.08
-"Oligodendrocyte (Precursor)",-0.23,-0.16,-0.23,FALSE,0.07
-"Oligodendrocyte (Mature)",0.72,0.76,0.72,FALSE,0.04
-"Microglia (Homeostatic)",0.14,0.11,0.14,FALSE,0.03
+"category","primary","sens_global","sens_neartie","sign_flip"
+"BAM",1.29,0.08,0.08,FALSE
+"Hippocampal pyramidal",-1.17,-0.85,-1.17,FALSE
+"Ependymal/ciliated",-1.01,0.38,0.38,TRUE
+"Astrocyte (Homeostatic)",0.84,0.7,0.84,FALSE
+"Dentate gyrus granule",-0.79,-0.38,-0.79,FALSE
+"Oligodendrocyte (Mature)",0.72,0.76,0.72,FALSE
+"Endothelial",0.46,0.56,0.46,FALSE
+"Fibroblast/meningeal",-0.35,0.12,-0.35,TRUE
+"Pericyte/vascular SMC",0.3,-0.01,0.3,TRUE
+"GABAergic interneuron",-0.29,-0.44,-0.29,FALSE
+"Oligodendrocyte (Precursor)",-0.23,-0.16,-0.23,FALSE
+"Microglia (Active)",0.22,0.12,0.12,FALSE
+"Microglia (Homeostatic)",0.14,0.11,0.14,FALSE
+"Unclassified",-0.07,-0.86,-0.15,FALSE
+"Astrocyte (Active)",-0.06,-0.14,-0.06,FALSE
