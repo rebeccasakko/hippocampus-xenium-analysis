@@ -53,3 +53,5 @@ rsconnect/
 # Allow summary tables in outputs/
 !outputs/*.csv
 !outputs/**/*.csv
+docs/review/
+
